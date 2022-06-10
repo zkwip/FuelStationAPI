@@ -1,5 +1,5 @@
 ﻿
-namespace ASPWebAPITest
+namespace FuelStationAPI
 {
     public class FuelStationQueryResult
     {

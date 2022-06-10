@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace ASPWebAPITest.Scraper
+namespace FuelStationAPI.Scraper
 {
     public class StringScraper
     {

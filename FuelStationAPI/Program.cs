@@ -1,4 +1,4 @@
-using ASPWebAPITest.Scraper;
+using FuelStationAPI.Scraper;
 
 var builder = WebApplication.CreateBuilder(args);
 

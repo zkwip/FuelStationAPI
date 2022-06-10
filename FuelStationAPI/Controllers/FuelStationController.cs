@@ -1,7 +1,7 @@
-﻿using ASPWebAPITest.Scraper;
+﻿using FuelStationAPI.Scraper;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ASPWebAPITest.Controllers
+namespace FuelStationAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]

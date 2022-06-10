@@ -1,4 +1,4 @@
-﻿namespace ASPWebAPITest
+﻿namespace FuelStationAPI
 {
     public class FuelStationScrapeResult
     {

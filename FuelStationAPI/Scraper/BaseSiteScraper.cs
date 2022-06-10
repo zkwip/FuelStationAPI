@@ -1,4 +1,4 @@
-﻿namespace ASPWebAPITest.Scraper
+﻿namespace FuelStationAPI.Scraper
 {
     public abstract class BaseSiteScraper : IFuelSiteScraper
     {
