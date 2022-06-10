@@ -9,7 +9,7 @@
             foreach (FuelStationScrapeResult scrape in scrapes)
             {
                 double cost = costCalculator(scrape);
-                if (cost != 0)
+                if (cost > 0)
                     items.Add(new FuelCostComparisonItem(scrape.Station, cost));
             }
 

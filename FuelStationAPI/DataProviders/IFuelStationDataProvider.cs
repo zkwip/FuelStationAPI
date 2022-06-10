@@ -1,9 +1,9 @@
-﻿namespace FuelStationAPI.Scraper
+﻿namespace FuelStationAPI.DataProvider
 {
-    public interface IFuelSiteScraper
+    public interface IFuelStationDataProvider
     {
         Task<IEnumerable<FuelStationData>> ScrapeStationListAsync();
         Task<FuelStationScrapeResult> ScrapeStationPricesAsync(FuelStationData station);
-        bool StationBrandCheck(FuelStationData station);
+        bool StationDataSourceCheck(FuelStationData station);
     }
 }

@@ -1,14 +1,14 @@
-﻿namespace FuelStationAPI.Scraper
+﻿namespace FuelStationAPI.DataProvider
 {
-    public abstract class BaseSiteScraper : IFuelSiteScraper
+    public abstract class BaseFuelStationDataProvider : IFuelStationDataProvider
     {
         protected string _stationDetailUrlPrefix;
         protected string _stationListUrl;
 
         protected readonly HttpClient _client;
-        protected readonly ILogger _logger;
+        protected readonly ILogger<BaseFuelStationDataProvider> _logger;
 
-        public BaseSiteScraper(HttpClient client, ILogger logger)
+        public BaseFuelStationDataProvider(HttpClient client, ILogger<BaseFuelStationDataProvider> logger)
         {
             _client = client;
             _logger = logger;
@@ -24,7 +24,7 @@
             return ExtractStations(msg);
         }
 
-        public abstract bool StationBrandCheck(FuelStationData station);
+        public abstract bool StationDataSourceCheck(FuelStationData station);
 
         public abstract IEnumerable<FuelStationData> ExtractStations(string msg);
 
@@ -42,7 +42,7 @@
 
             if (prices.Count == 0)
             {
-                _logger.Log(LogLevel.Information, "The station {station} did not result any fuel prices", station.Name);
+                _logger.Log(LogLevel.Information, "The station {station} ({identifier}) did not provide any fuel prices", station.Name, station.Identifier);
                 return new FuelStationScrapeResult(station, new Exception("No prices found"));
             }
 

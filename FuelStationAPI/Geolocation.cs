@@ -11,6 +11,8 @@
         public static readonly Geolocation Strijp = new(51.451438, 5.439417);
         public static readonly Geolocation Ooij = new(51.845234, 5.889089);
         public static readonly Geolocation Veghel = new(51.622560, 5.531636);
+        public static readonly Geolocation Maastricht = new(50.856897, 5.737858);
+
         public double Latitude { get; }
 
         public double Longitude { get; }

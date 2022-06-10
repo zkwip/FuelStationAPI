@@ -1,4 +1,4 @@
-﻿using FuelStationAPI.Scraper;
+﻿using FuelStationAPI.DataProvider;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FuelStationAPI.Controllers
@@ -8,14 +8,14 @@ namespace FuelStationAPI.Controllers
     public class FuelStationController : ControllerBase
     {
         private readonly ILogger<FuelStationController> _logger;
-        private readonly IEnumerable<IFuelSiteScraper> _scrapers;
+        private readonly IEnumerable<IFuelStationDataProvider> _scrapers;
         private Geolocation _location;
 
-        public FuelStationController(ILogger<FuelStationController> logger, IEnumerable<IFuelSiteScraper> scrapers)
+        public FuelStationController(ILogger<FuelStationController> logger, IEnumerable<IFuelStationDataProvider> scrapers)
         {
             _logger = logger;
             _scrapers = scrapers;
-            _location = Geolocation.Strijp;
+            _location = Geolocation.Maastricht;
         }
 
         [HttpGet("GetFuelStations")]
@@ -52,14 +52,23 @@ namespace FuelStationAPI.Controllers
         public async Task<IEnumerable<FuelStationData>> ListFilteredStationsAsync()
         {
             IEnumerable<FuelStationData> list = await ListAllStationsAsync();
-            list = list.Where(x => Geolocation.Distance(x.Location, Geolocation.Strijp) < 5);
+            list = list.Where(x => Geolocation.Distance(x.Location, Geolocation.Maastricht) < 15);
             return list;
         }
 
         private async Task<FuelCostComparison> ComparePricesOnly(IEnumerable<FuelStationData> stations, FuelType type = FuelType.Euro95)
         {
             IEnumerable<FuelStationScrapeResult> scrapes = await ScrapeStations(stations);
-            return new FuelCostComparison(scrapes, r => r.FuelPrices.Where(x => x.FuelType == type).Select(x => x.Price).Min()); ;
+            return new FuelCostComparison(scrapes, r => GetFuelPrice(type,r));
+        }
+
+        private double GetFuelPrice(FuelType type, FuelStationScrapeResult result)
+        {
+            foreach (FuelPriceResult price in result.FuelPrices)
+                if (price.FuelType == type) 
+                    return price.Price;
+
+            return -1;
         }
 
         private async Task<IEnumerable<FuelStationScrapeResult>> ScrapeStations(IEnumerable<FuelStationData> stations)
@@ -79,9 +88,9 @@ namespace FuelStationAPI.Controllers
 
         private async Task<FuelStationScrapeResult?> ScrapeStation(FuelStationData station)
         {
-            foreach (IFuelSiteScraper scraper in _scrapers)
+            foreach (IFuelStationDataProvider scraper in _scrapers)
             {
-                if (!scraper.StationBrandCheck(station))
+                if (!scraper.StationDataSourceCheck(station))
                     continue;
 
                 return await scraper.ScrapeStationPricesAsync(station);

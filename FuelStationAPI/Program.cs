@@ -1,17 +1,18 @@
-using FuelStationAPI.Scraper;
+using FuelStationAPI.DataProvider;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddSingleton<HttpClient>();
-builder.Services.AddSingleton<IFuelSiteScraper>(x => new TinqSiteScraper(x.GetService<HttpClient>()!, x.GetService<ILogger>()!));
-builder.Services.AddSingleton<IFuelSiteScraper>(x => new TangoSiteScraper(x.GetService<HttpClient>()!, x.GetService<ILogger>()!));
+builder.Services.AddScoped<IFuelStationDataProvider, TinqStationDataProvider>();
+builder.Services.AddScoped<IFuelStationDataProvider, TangoStationDataProvider>();
+builder.Services.AddScoped<IFuelStationDataProvider, CarbuStationDataProvider>();
 builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 
 var app = builder.Build();
 

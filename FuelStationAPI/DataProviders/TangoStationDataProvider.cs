@@ -1,8 +1,10 @@
-﻿namespace FuelStationAPI.Scraper
+﻿using FuelStationAPI.DataProvider;
+
+namespace FuelStationAPI.DataProvider
 {
-    public class TangoSiteScraper : BaseSiteScraper
+    public class TangoStationDataProvider : BaseFuelStationDataProvider
     {
-        public TangoSiteScraper(HttpClient client, ILogger logger) : base(client, logger)
+        public TangoStationDataProvider(HttpClient client, ILogger<BaseFuelStationDataProvider> logger) : base(client, logger)
         {
             _stationDetailUrlPrefix = @"https://www.tango.nl/stations/";
         }
@@ -43,7 +45,7 @@
             return list;
         }
 
-        private static void ExtractPrice(string msg, List<FuelPriceResult> list, string handle, FuelType type)
+        private void ExtractPrice(string msg, List<FuelPriceResult> list, string handle, FuelType type)
         {
             StringScraper scraper = new(msg);
             try
@@ -53,10 +55,10 @@
                 scraper.ReadTo("<span class=\"price\">");
                 list.Add(new(type, scraper.ReadDecimalTo("</span>")));
             }
-            catch (ScrapeException) { }
+            catch (ScrapeException ex) { _logger.LogInformation(ex.Message); }
         }
 
-        public override bool StationBrandCheck(FuelStationData station) => (station.Brand.ToLower() == "tango");
+        public override bool StationDataSourceCheck(FuelStationData station) => (station.DataPrivider.ToLower() == "tango");
 
         public override IEnumerable<FuelStationData> ExtractStations(string msg)
         {

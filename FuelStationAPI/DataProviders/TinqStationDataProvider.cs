@@ -1,14 +1,14 @@
-﻿namespace FuelStationAPI.Scraper
+﻿namespace FuelStationAPI.DataProvider
 {
-    public class TinqSiteScraper : BaseSiteScraper
+    public class TinqStationDataProvider : BaseFuelStationDataProvider
     {
-        public TinqSiteScraper(HttpClient client, ILogger logger) : base(client, logger)
+        public TinqStationDataProvider(HttpClient client, ILogger<BaseFuelStationDataProvider> logger) : base(client, logger)
         {
             _stationDetailUrlPrefix = "https://www.tinq.nl/tankstations/";
             _stationListUrl = "https://www.tinq.nl/tankstations";
         }
 
-        public override bool StationBrandCheck(FuelStationData station) => (station.Brand.ToLower() == "tinq");
+        public override bool StationDataSourceCheck(FuelStationData station) => (station.DataPrivider.ToLower() == "tinq");
 
         public override IEnumerable<FuelStationData> ExtractStations(string msg)
         {

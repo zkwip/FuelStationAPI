@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace FuelStationAPI.Scraper
+namespace FuelStationAPI.DataProvider
 {
     public class StringScraper
     {
@@ -32,6 +32,15 @@ namespace FuelStationAPI.Scraper
                 return value;
 
             throw new ScrapeException("The string \"" + last + "\" does not parse as a number");
+
+        }
+
+        public double ReadCommaDecimalTo(string handle)
+        {
+            string textToParse = ReadTo(handle);
+            if (double.TryParse(textToParse, NumberStyles.AllowDecimalPoint, CultureInfo.CreateSpecificCulture("fr-FR"), out double value))
+                return value;
+            throw new ScrapeException("The string \"" + textToParse + "\" does not parse as a number");
 
         }
     }
