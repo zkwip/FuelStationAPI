@@ -1,4 +1,4 @@
-﻿namespace FuelStationAPI.DataProvider
+﻿namespace FuelStationAPI.DataProviders
 {
     public interface IFuelStationDataProvider
     {

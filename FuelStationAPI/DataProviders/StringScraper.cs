@@ -1,14 +1,17 @@
 ﻿using System.Globalization;
+using System.Text.RegularExpressions;
 
-namespace FuelStationAPI.DataProvider
+namespace FuelStationAPI.DataProviders
 {
     public class StringScraper
     {
         private string _text;
+        private readonly Regex _regex;
 
         public StringScraper(string text)
         {
             _text = text;
+            _regex = new Regex("<[^>]*>|[^0-9.,]");
         }
 
         public string ReadTo(string handle)
@@ -27,21 +30,24 @@ namespace FuelStationAPI.DataProvider
 
         public double ReadDecimalTo(string handle)
         {
-            string last = ReadTo(handle);
-            if (double.TryParse(last, NumberStyles.AllowDecimalPoint, CultureInfo.CreateSpecificCulture("en-US"), out double value))
+            string textToParse = ReadTo(handle);
+            textToParse = _regex.Replace(textToParse, "");
+
+            if (double.TryParse(textToParse, NumberStyles.AllowDecimalPoint, CultureInfo.CreateSpecificCulture("en-US"), out double value))
                 return value;
 
-            throw new ScrapeException("The string \"" + last + "\" does not parse as a number");
-
+            throw new ScrapeException("The string \"" + textToParse + "\" does not parse as a number");
         }
 
         public double ReadCommaDecimalTo(string handle)
         {
             string textToParse = ReadTo(handle);
+            textToParse = _regex.Replace(textToParse, "");
+
             if (double.TryParse(textToParse, NumberStyles.AllowDecimalPoint, CultureInfo.CreateSpecificCulture("fr-FR"), out double value))
                 return value;
-            throw new ScrapeException("The string \"" + textToParse + "\" does not parse as a number");
 
+            throw new ScrapeException("The string \"" + textToParse + "\" does not parse as a number");
         }
     }
 

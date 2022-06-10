@@ -1,4 +1,4 @@
-﻿using FuelStationAPI.DataProvider;
+﻿using FuelStationAPI.DataProviders;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FuelStationAPI.Controllers
@@ -15,7 +15,7 @@ namespace FuelStationAPI.Controllers
         {
             _logger = logger;
             _scrapers = scrapers;
-            _location = Geolocation.Maastricht;
+            _location = Geolocation.Ooij;
         }
 
         [HttpGet("GetFuelStations")]
@@ -52,7 +52,7 @@ namespace FuelStationAPI.Controllers
         public async Task<IEnumerable<FuelStationData>> ListFilteredStationsAsync()
         {
             IEnumerable<FuelStationData> list = await ListAllStationsAsync();
-            list = list.Where(x => Geolocation.Distance(x.Location, Geolocation.Maastricht) < 15);
+            list = list.Where(x => Geolocation.Distance(x.Location, _location) < 15);
             return list;
         }
 
@@ -62,7 +62,7 @@ namespace FuelStationAPI.Controllers
             return new FuelCostComparison(scrapes, r => GetFuelPrice(type,r));
         }
 
-        private double GetFuelPrice(FuelType type, FuelStationScrapeResult result)
+        private static double GetFuelPrice(FuelType type, FuelStationScrapeResult result)
         {
             foreach (FuelPriceResult price in result.FuelPrices)
                 if (price.FuelType == type) 

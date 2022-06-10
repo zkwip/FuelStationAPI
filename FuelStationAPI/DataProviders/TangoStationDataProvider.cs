@@ -1,6 +1,6 @@
-﻿using FuelStationAPI.DataProvider;
+﻿using FuelStationAPI.DataProviders;
 
-namespace FuelStationAPI.DataProvider
+namespace FuelStationAPI.DataProviders
 {
     public class TangoStationDataProvider : BaseFuelStationDataProvider
     {
@@ -55,7 +55,7 @@ namespace FuelStationAPI.DataProvider
                 scraper.ReadTo("<span class=\"price\">");
                 list.Add(new(type, scraper.ReadDecimalTo("</span>")));
             }
-            catch (ScrapeException ex) { _logger.LogInformation(ex.Message); }
+            catch (ScrapeException) {}
         }
 
         public override bool StationDataSourceCheck(FuelStationData station) => (station.DataPrivider.ToLower() == "tango");

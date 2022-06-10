@@ -1,4 +1,4 @@
-﻿namespace FuelStationAPI.DataProvider
+﻿namespace FuelStationAPI.DataProviders
 {
     public class CarbuStationDataProvider : BaseFuelStationDataProvider
     {
@@ -65,10 +65,7 @@
 
                 list.Add(new(type, price));
             }
-            catch (ScrapeException)
-            {
-                return;
-            }
+            catch (ScrapeException) { }
         }
     }
 }

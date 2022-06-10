@@ -42,5 +42,7 @@
             return (x, y, z);
         }
 
+        public string LinkTo() => String.Format("https://maps.google.com/maps?daddr={0},{0}", Latitude, Longitude);
+
     }
 }

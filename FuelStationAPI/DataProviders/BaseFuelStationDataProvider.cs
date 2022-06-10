@@ -1,4 +1,4 @@
-﻿namespace FuelStationAPI.DataProvider
+﻿namespace FuelStationAPI.DataProviders
 {
     public abstract class BaseFuelStationDataProvider : IFuelStationDataProvider
     {
@@ -19,7 +19,7 @@
 
         public virtual async Task<IEnumerable<FuelStationData>> ScrapeStationListAsync()
         {
-            HttpResponseMessage message = await _client.GetAsync(_stationListUrl);
+            using HttpResponseMessage message = await _client.GetAsync(_stationListUrl);
             string msg = await message.Content.ReadAsStringAsync();
             return ExtractStations(msg);
         }
@@ -31,7 +31,7 @@
         public virtual async Task<FuelStationScrapeResult> ScrapeStationPricesAsync(FuelStationData station)
         {
             string url = _stationDetailUrlPrefix + station.Identifier;
-            HttpResponseMessage message = await _client.GetAsync(url);
+            using HttpResponseMessage message = await _client.GetAsync(url);
 
             if (!message.IsSuccessStatusCode)
                 return new FuelStationScrapeResult(station, new Exception(message.ReasonPhrase));
