@@ -1,22 +1,27 @@
-﻿namespace FuelStationAPI.DataProviders
+﻿using Microsoft.Extensions.Caching.Memory;
+
+namespace FuelStationAPI.DataProviders
 {
     public class CarbuStationDataProvider : BaseFuelStationDataProvider
     {
-        public CarbuStationDataProvider(HttpClient client, ILogger<BaseFuelStationDataProvider> logger) : base(client, logger)
+        public CarbuStationDataProvider(HttpClient client, ILogger<BaseFuelStationDataProvider> logger, IMemoryCache cache) : base(client, logger, cache)
         {
             _stationDetailUrlPrefix = "https://carbu.com/belgie/index.php/station/";
             _stationListUrl = "https://carbu.com/belgie//liste-stations-service/E10/Bilzen/3740/BE_li_701";
         }
 
+        protected override string StationProviderName => "carbu";
+
         public override IEnumerable<FuelStationData> ExtractStations(string msg)
         {
             List<FuelStationData> list = new();
-            StringScraper scraper = new StringScraper(msg);
+            StringScraper scraper = new(msg);
 
             while (true)
             {
                 try
                 {
+                    if (!scraper.TestReadTo("<div class=\"station-content col-xs-12\">")) break;
                     scraper.ReadTo("<div class=\"station-content col-xs-12\">");
 
                     scraper.ReadTo("data-lat=\"");
@@ -40,8 +45,6 @@
             }
             return list;
         }
-
-        public override bool StationDataSourceCheck(FuelStationData station) => (station.DataPrivider.ToLower() == "carbu");
 
         protected override List<FuelPriceResult> ExtractPrices(string msg)
         {

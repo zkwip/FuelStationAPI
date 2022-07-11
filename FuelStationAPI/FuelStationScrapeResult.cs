@@ -6,13 +6,13 @@
 
         public IEnumerable<FuelPriceResult> FuelPrices { get; }
 
-        public Exception? Exception { get; }
+        public String FaultMessage { get; }
 
         public FuelStationData Station { get; }
 
         public FuelStationScrapeResult(FuelStationData station, Exception ex)
         {
-            Exception = ex;
+            FaultMessage = ex.Message;
             Succes = false;
             FuelPrices = new List<FuelPriceResult>();
             Station = station;
@@ -23,6 +23,7 @@
             FuelPrices = fuelPrices;
             Succes = true;
             Station = station;
+            FaultMessage = "";
         }
     }
 }

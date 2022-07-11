@@ -1,14 +1,16 @@
-﻿namespace FuelStationAPI.DataProviders
+﻿using Microsoft.Extensions.Caching.Memory;
+
+namespace FuelStationAPI.DataProviders
 {
     public class TinqStationDataProvider : BaseFuelStationDataProvider
     {
-        public TinqStationDataProvider(HttpClient client, ILogger<BaseFuelStationDataProvider> logger) : base(client, logger)
+        public TinqStationDataProvider(HttpClient client, ILogger<BaseFuelStationDataProvider> logger, IMemoryCache cache) : base(client, logger, cache)
         {
             _stationDetailUrlPrefix = "https://www.tinq.nl/tankstations/";
             _stationListUrl = "https://www.tinq.nl/tankstations";
         }
 
-        public override bool StationDataSourceCheck(FuelStationData station) => (station.DataPrivider.ToLower() == "tinq");
+        protected override string StationProviderName => "tinq";
 
         public override IEnumerable<FuelStationData> ExtractStations(string msg)
         {
@@ -62,7 +64,7 @@
             try
             {
                 StringScraper scraper = new(msg);
-
+                if (!scraper.TestReadTo("<div class=\"node node--type-price node--view-mode-default taxonomy-term-" + handle + " ds-1col clearfix\">")) return;
                 scraper.ReadTo("<div class=\"node node--type-price node--view-mode-default taxonomy-term-" + handle + " ds-1col clearfix\">");
                 scraper.ReadTo("<div content=\"");
                 double price = scraper.ReadDecimalTo("\" class=\"field field--name-field-prices-price-pump field--type-float field--label-hidden field__item\">");

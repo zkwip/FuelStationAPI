@@ -1,8 +1,12 @@
-﻿namespace FuelStationAPI.DataProviders
+﻿using Microsoft.Extensions.Caching.Memory;
+
+namespace FuelStationAPI.DataProviders
 {
     public class ArgosStationDataProvider : BaseFuelStationDataProvider
     {
-        public ArgosStationDataProvider(HttpClient client, ILogger<BaseFuelStationDataProvider> logger) : base(client, logger)
+        protected override string StationProviderName => "argos";
+
+        public ArgosStationDataProvider(HttpClient client, ILogger<BaseFuelStationDataProvider> logger, IMemoryCache cache) : base(client, logger, cache)
         {
             _stationDetailUrlPrefix = "https://www.argos.nl/tankstation/";
             _stationListUrl = "https://www.argos.nl/tankstations/";
@@ -10,7 +14,7 @@
         public override IEnumerable<FuelStationData> ExtractStations(string msg)
         {
             List<FuelStationData> list = new();
-            StringScraper scraper = new StringScraper(msg);
+            StringScraper scraper = new(msg);
 
             scraper.ReadTo("<div id=\"tankstation-map\">");
 
@@ -18,6 +22,7 @@
             {
                 try
                 {
+                    if (!scraper.TestReadTo("<div class=\"marker\" data-id=\"")) break;
                     scraper.ReadTo("<div class=\"marker\" data-id=\"");
 
                     scraper.ReadTo("data-lat=\"");
@@ -41,8 +46,6 @@
             }
             return list;
         }
-
-        public override bool StationDataSourceCheck(FuelStationData station) => (station.DataPrivider.ToLower() == "argos");
 
         protected override List<FuelPriceResult> ExtractPrices(string msg)
         {

@@ -1,8 +1,10 @@
-﻿namespace FuelStationAPI.DataProviders
+﻿using Microsoft.Extensions.Caching.Memory;
+
+namespace FuelStationAPI.DataProviders
 {
     public class CleverTankenStationDataProvider : BaseFuelStationDataProvider
     {
-        public CleverTankenStationDataProvider(HttpClient client, ILogger<BaseFuelStationDataProvider> logger) : base(client, logger)
+        public CleverTankenStationDataProvider(HttpClient client, ILogger<BaseFuelStationDataProvider> logger, IMemoryCache cache) : base(client, logger, cache)
         {
             _stationDetailUrlPrefix = "https://www.clever-tanken.de/tankstelle_details/";
             _stationListUrl = "https://www.clever-tanken.de/tankstelle_liste?lat=51.808520305084&lon=5.96523930478924&ort=47559+Kranenburg%2FWyler&spritsorte=5&r=15";
@@ -12,7 +14,7 @@
         {
             List<FuelStationData> list = new();
             List<Geolocation> locations = new();
-            StringScraper scraper = new StringScraper(msg);
+            StringScraper scraper = new(msg);
 
             scraper.ReadTo("var firstTimeToggle = true;");
 
@@ -21,6 +23,8 @@
             {
                 try
                 {
+                    if (!scraper.TestReadTo("addPoi('")) break;
+
                     scraper.ReadTo("addPoi('");
                     double lat = scraper.ReadCommaDecimalTo("', '");
                     double lng = scraper.ReadCommaDecimalTo("','','");
@@ -41,6 +45,8 @@
             {
                 try
                 {
+                    if (!scraper.TestReadTo("<a href=\"/tankstelle_details/")) break;
+
                     scraper.ReadTo("<a href=\"/tankstelle_details/");
                     string ident = scraper.ReadTo("\"");
                     scraper.ReadTo("', 'hover', '");
@@ -62,7 +68,7 @@
             return list;
         }
 
-        public override bool StationDataSourceCheck(FuelStationData station) => (station.DataPrivider.ToLower() == "clevertanken");
+        protected override string StationProviderName => "clevertanken";
 
         protected override List<FuelPriceResult> ExtractPrices(string msg)
         {
@@ -80,7 +86,7 @@
             try
             {
                 StringScraper scraper = new(msg);
-
+                if (!scraper.TestReadTo("<div class=\"price-type-name\">" + handle + "</div>")) return;
                 scraper.ReadTo("<div class=\"price-type-name\">" + handle + "</div>");
                 scraper.ReadTo("<div class=\"price-field\">");
                 double price = scraper.ReadDecimalTo("</div>");

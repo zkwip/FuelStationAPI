@@ -1,10 +1,11 @@
 ﻿using FuelStationAPI.DataProviders;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace FuelStationAPI.DataProviders
 {
     public class TangoStationDataProvider : BaseFuelStationDataProvider
     {
-        public TangoStationDataProvider(HttpClient client, ILogger<BaseFuelStationDataProvider> logger) : base(client, logger)
+        public TangoStationDataProvider(HttpClient client, ILogger<BaseFuelStationDataProvider> logger, IMemoryCache cache) : base(client, logger, cache)
         {
             _stationDetailUrlPrefix = @"https://www.tango.nl/stations/";
         }
@@ -18,7 +19,7 @@ namespace FuelStationAPI.DataProviders
         public async override Task<FuelStationScrapeResult> ScrapeStationPricesAsync(FuelStationData station)
         {
             string url = _stationDetailUrlPrefix + station.Identifier;
-            HttpResponseMessage message = await _client.GetAsync(url);
+            HttpResponseMessage message = await _httpClient.GetAsync(url);
 
             if (!message.IsSuccessStatusCode)
                 return new FuelStationScrapeResult(station, new Exception(message.ReasonPhrase));
@@ -50,6 +51,8 @@ namespace FuelStationAPI.DataProviders
             StringScraper scraper = new(msg);
             try
             {
+                if (!scraper.TestReadTo("\" id=\"" + handle + "\">")) return;
+
                 scraper.ReadTo("\" id=\"" + handle + "\">");
                 scraper.ReadTo("<div class=\"pump_price\">");
                 scraper.ReadTo("<span class=\"price\">");
@@ -58,7 +61,7 @@ namespace FuelStationAPI.DataProviders
             catch (ScrapeException) {}
         }
 
-        public override bool StationDataSourceCheck(FuelStationData station) => (station.DataPrivider.ToLower() == "tango");
+        protected override string StationProviderName => "tango";
 
         public override IEnumerable<FuelStationData> ExtractStations(string msg)
         {

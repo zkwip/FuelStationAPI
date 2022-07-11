@@ -5,25 +5,39 @@ namespace FuelStationAPI.DataProviders
 {
     public class StringScraper
     {
-        private string _text;
+        private readonly string _text;
         private readonly Regex _regex;
+        private int _start;
+        private int _length;
 
         public StringScraper(string text)
         {
             _text = text;
+            _start = 0;
+            _length = text.Length;
             _regex = new Regex("<[^>]*>|[^0-9.,]");
         }
 
+        private ReadOnlySpan<char> TextSpan => _text.AsSpan(_start, _length);
+
+        private void SetTextStart(int offset) 
+        {
+            _start += offset; 
+            _length -= offset;
+        }
+
+        public bool TestReadTo(string handle) => TextSpan.IndexOf(handle) >= 0;
+
         public string ReadTo(string handle)
         {
-            int start = _text.IndexOf(handle);
+            int start = TextSpan.IndexOf(handle);
             if (start == -1)
-                throw new ScrapeException("Could not find the handle in the string");
+                throw new ScrapeException("Could not find the handle in the string: " + handle);
 
             int end = start + handle.Length;
 
-            string res = _text[..start];
-            _text = _text[end..];
+            string res = TextSpan[..start].ToString();
+            SetTextStart(end);
 
             return res;
         }
