@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "ASPWebAPITest": {
+    "FuelStationAPI": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

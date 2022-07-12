@@ -49,8 +49,8 @@ namespace FuelStationAPI.DataProviders
         protected override List<FuelPriceResult> ExtractPrices(string msg)
         {
             List<FuelPriceResult> list = new();
-            ExtractPrice(msg, list, "Super 95 (E10)", FuelType.Euro95);
-            ExtractPrice(msg, list, "Super 98 (E5)", FuelType.Euro98);
+            ExtractPrice(msg, list, "Super 95 (E10)", FuelType.Euro95_E10);
+            ExtractPrice(msg, list, "Super 98 (E5)", FuelType.Euro98_E5);
             ExtractPrice(msg, list, "Diesel (B7)", FuelType.Diesel);
             return list;
         }

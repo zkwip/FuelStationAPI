@@ -6,7 +6,7 @@ namespace FuelStationAPI.DataProviders
     public class StringScraper
     {
         private readonly string _text;
-        private readonly Regex _regex;
+        private static readonly Regex _numberRegex = new("<[^>]*>|[^0-9.,]");
         private int _start;
         private int _length;
 
@@ -15,7 +15,12 @@ namespace FuelStationAPI.DataProviders
             _text = text;
             _start = 0;
             _length = text.Length;
-            _regex = new Regex("<[^>]*>|[^0-9.,]");
+        }
+
+        public void Reset()
+        {
+            _start = 0;
+            _length = _text.Length;
         }
 
         private ReadOnlySpan<char> TextSpan => _text.AsSpan(_start, _length);
@@ -45,7 +50,7 @@ namespace FuelStationAPI.DataProviders
         public double ReadDecimalTo(string handle)
         {
             string textToParse = ReadTo(handle);
-            textToParse = _regex.Replace(textToParse, "");
+            textToParse = _numberRegex.Replace(textToParse, "");
 
             if (double.TryParse(textToParse, NumberStyles.AllowDecimalPoint, CultureInfo.CreateSpecificCulture("en-US"), out double value))
                 return value;
@@ -56,7 +61,7 @@ namespace FuelStationAPI.DataProviders
         public double ReadCommaDecimalTo(string handle)
         {
             string textToParse = ReadTo(handle);
-            textToParse = _regex.Replace(textToParse, "");
+            textToParse = _numberRegex.Replace(textToParse, "");
 
             if (double.TryParse(textToParse, NumberStyles.AllowDecimalPoint, CultureInfo.CreateSpecificCulture("fr-FR"), out double value))
                 return value;

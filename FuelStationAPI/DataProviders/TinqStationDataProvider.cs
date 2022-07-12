@@ -52,8 +52,8 @@ namespace FuelStationAPI.DataProviders
         {
             List<FuelPriceResult> list = new();
 
-            ExtractPrice(msg, list, "Euro95 E10", FuelType.Euro95);
-            ExtractPrice(msg, list, "Superplus 98 E5", FuelType.Euro98);
+            ExtractPrice(msg, list, "Euro95 E10", FuelType.Euro95_E10);
+            ExtractPrice(msg, list, "Superplus 98 E5", FuelType.Euro98_E5);
             ExtractPrice(msg, list, "Diesel B7", FuelType.Diesel);
 
             return list;

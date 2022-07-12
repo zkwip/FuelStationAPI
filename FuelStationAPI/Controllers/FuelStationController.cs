@@ -56,7 +56,7 @@ namespace FuelStationAPI.Controllers
             return list;
         }
 
-        private async Task<FuelCostComparison> ComparePricesOnly(IEnumerable<FuelStationData> stations, FuelType type = FuelType.Euro95)
+        private async Task<FuelCostComparison> ComparePricesOnly(IEnumerable<FuelStationData> stations, FuelType type = FuelType.Euro95_E10)
         {
             IEnumerable<FuelStationScrapeResult> scrapes = await ScrapeStations(stations);
             return new FuelCostComparison(scrapes, r => GetFuelPrice(type,r));
