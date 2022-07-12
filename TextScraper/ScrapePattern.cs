@@ -1,4 +1,4 @@
-﻿namespace FuelStationAPI.DataProviders
+﻿namespace TextScraper
 {
     public class ScrapePattern : IScrapePattern, IOpenScrapePattern, IClosedScrapePattern
     {
@@ -13,8 +13,7 @@
 
         public static IClosedScrapePattern Create()
         {
-            var pattern = new ScrapePattern();
-            return pattern;
+            return new ScrapePattern();
         }
 
         public IScrapePattern AddHandle(string handle)
@@ -29,17 +28,17 @@
             return this;
         }
 
-        public Dictionary<string, string> Run(StringScraper scraper)
+        public Dictionary<string, SmartSubstring> Run(Scraper scraper)
         {
-            Dictionary<string, string> result = new();
+            Dictionary<string, SmartSubstring> result = new();
 
-            for (int i = 0; i < _handles.Count; i++) 
+            for (int i = 0; i < _handles.Count; i++)
                 StepHandles(scraper, result, i);
-            
+
             return result;
         }
 
-        private void StepHandles(StringScraper scraper, Dictionary<string, string> result, int i)
+        private void StepHandles(Scraper scraper, Dictionary<string, SmartSubstring> result, int i)
         {
             if (_names.ContainsKey(i))
             {
@@ -60,11 +59,10 @@
     {
         IScrapePattern AddHandle(string handle);
         IOpenScrapePattern AddGetter(string name);
-
     }
 
     public interface IScrapePattern : IClosedScrapePattern
-    { 
-        public Dictionary<string, string> Run(StringScraper scraper);
+    {
+        public Dictionary<string, SmartSubstring> Run(Scraper scraper);
     }
 }
