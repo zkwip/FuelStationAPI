@@ -29,7 +29,7 @@
             if (start < 0 || start > _length)
                 throw new ArgumentOutOfRangeException(nameof(start));
 
-            if (length < 0 || length > _length)
+            if (length < 0 || length + start > _length)
                 throw new ArgumentOutOfRangeException(nameof(length));
 
             return new(_text, _start + start, length);
