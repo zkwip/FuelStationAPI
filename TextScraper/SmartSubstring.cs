@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TextScraper
+﻿namespace TextScraper
 {
     public struct SmartSubstring
     {
@@ -8,7 +6,7 @@ namespace TextScraper
         private readonly int _start;
         private readonly int _length;
 
-        public SmartSubstring(string text) : this()
+        public SmartSubstring(string text)
         {
             _text = text;
             _start = 0;
