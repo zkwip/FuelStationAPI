@@ -47,6 +47,15 @@ namespace FuelStationAPI.DataProviders
             return res;
         }
 
+        public void SkipTo(string handle)
+        {
+            int start = TextSpan.IndexOf(handle);
+            if (start == -1)
+                throw new ScrapeException("Could not find the handle in the string: " + handle);
+
+            SetTextStart(start + handle.Length);
+        }
+
         public double ReadDecimalTo(string handle)
         {
             string textToParse = ReadTo(handle);
