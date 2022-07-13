@@ -15,26 +15,18 @@ namespace FuelStationAPI.DataProviders
 
         public override IEnumerable<FuelStationData> ExtractStations(string msg)
         {
-            const string handle_lat = "data-lat=\"";
-            const string handle_lng = "data-lng=\"";
-            const string handle_name = "<span class=\"field-content\"><h2>";
-            const string handle_name_end = "</h2>";
-            const string handle_identifier = "<span class=\"field-content\"><a href=\"/tankstations/";
-            const string handle_identifier_end = "#default";
+            const string latPrefix = "data-lat=\"";
+            const string lngPrefix = "data-lng=\"";
+            const string namePrefix = "<span class=\"field-content\"><h2>";
+            const string nameSuffix = "</h2>";
+            const string identifierPrefix = "<span class=\"field-content\"><a href=\"/tankstations/";
+            const string identifierSuffix = "#default";
 
             ScrapePattern pattern = ScrapePattern.Create()
-                .AddHandle(handle_lat)
-                .AddGetter("lat")
-                .AddHandle("\"")
-                .AddHandle(handle_lng)
-                .AddGetter("lng")
-                .AddHandle("\"")
-                .AddHandle(handle_name)
-                .AddGetter("name")
-                .AddHandle(handle_name_end)
-                .AddHandle(handle_identifier)
-                .AddGetter("identifier")
-                .AddHandle(handle_identifier_end);
+                .AddEnclosedGetter("lat", latPrefix, "\"")
+                .AddEnclosedGetter("lng", lngPrefix, "\"")
+                .AddEnclosedGetter("name", namePrefix, nameSuffix)
+                .AddEnclosedGetter("identifier", identifierPrefix, identifierSuffix);
 
             Scraper scraper = new(msg);
             List<FuelStationData> res = new();
@@ -44,6 +36,9 @@ namespace FuelStationAPI.DataProviders
                 try
                 {
                     var result = pattern.Run(scraper);
+                    
+                    if (!result.Succes) 
+                        break;
 
                     var lat = result["lat"].ToDouble();
                     var lng = result["lng"].ToDouble();
@@ -71,16 +66,17 @@ namespace FuelStationAPI.DataProviders
 
         private static void ExtractPrice(string msg, List<FuelPriceResult> prices, string handle, FuelType type)
         {
+            Scraper scraper = new(msg);
+
+            const string pricePrefix = "<div content=\"";
+            const string priceSuffix = "\" class=\"field field--name-field-prices-price-pump field--type-float field--label-hidden field__item\">";
+
+            ScrapePattern pattern = ScrapePattern.Create()
+                .AddHandle("<div class=\"node node--type-price node--view-mode-default taxonomy-term-" + handle + " ds-1col clearfix\">")
+                .AddEnclosedGetter("price", pricePrefix, priceSuffix);
+
             try
             {
-                Scraper scraper = new(msg);
-
-                ScrapePattern pattern = ScrapePattern.Create()
-                    .AddHandle("<div class=\"node node--type-price node--view-mode-default taxonomy-term-" + handle + " ds-1col clearfix\">")
-                    .AddHandle("<div content=\"")
-                    .AddGetter("price")
-                    .AddHandle("\" class=\"field field--name-field-prices-price-pump field--type-float field--label-hidden field__item\">");
-
                 var price = pattern.Run(scraper)["price"].ToDouble();
 
                 prices.Add(new(type, price));
