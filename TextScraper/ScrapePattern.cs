@@ -1,6 +1,6 @@
 ﻿namespace TextScraper
 {
-    public class ScrapePattern : IScrapePattern, IOpenScrapePattern, IClosedScrapePattern
+    public class ScrapePattern : IExtendableScrapePattern
     {
         private readonly List<string> _handles;
         private readonly Dictionary<int, string> _names;
@@ -11,12 +11,12 @@
             _handles = new List<string>();
         }
 
-        public static IClosedScrapePattern Create()
+        public static IExtendableScrapePattern Create()
         {
             return new ScrapePattern();
         }
 
-        public IScrapePattern AddHandle(string handle)
+        public ScrapePattern AddHandle(string handle)
         {
             _handles.Add(handle);
             return this;
@@ -33,12 +33,12 @@
             Dictionary<string, SmartSubstring> result = new();
 
             for (int i = 0; i < _handles.Count; i++)
-                StepHandles(scraper, result, i);
+                StepOverHandles(scraper, result, i);
 
             return result;
         }
 
-        private void StepHandles(Scraper scraper, Dictionary<string, SmartSubstring> result, int i)
+        private void StepOverHandles(Scraper scraper, Dictionary<string, SmartSubstring> result, int i)
         {
             if (_names.ContainsKey(i))
             {
@@ -52,17 +52,11 @@
 
     public interface IOpenScrapePattern
     {
-        IScrapePattern AddHandle(string handle);
+        ScrapePattern AddHandle(string handle);
     }
 
-    public interface IClosedScrapePattern
+    public interface IExtendableScrapePattern : IOpenScrapePattern
     {
-        IScrapePattern AddHandle(string handle);
         IOpenScrapePattern AddGetter(string name);
-    }
-
-    public interface IScrapePattern : IClosedScrapePattern
-    {
-        public Dictionary<string, SmartSubstring> Run(Scraper scraper);
     }
 }

@@ -13,6 +13,11 @@ namespace TextScraper
             _text = new SmartSubstring(text);
         }
 
+        public Scraper(SmartSubstring text)
+        {
+            _text = text;
+        }
+
         private ReadOnlySpan<char> TextSpan => _text.AsSpan();
 
         public bool TestReadTo(string handle) => TextSpan.IndexOf(handle) >= 0;
