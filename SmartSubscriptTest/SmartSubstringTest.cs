@@ -8,7 +8,7 @@ namespace TextScraperTests
     {
         private readonly string _text = "hello how are you";
 
-        private SmartSubstring _sut;
+        private readonly SmartSubstring _sut;
 
         public SmartSubstringTest()
         {
