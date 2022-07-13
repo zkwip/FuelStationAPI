@@ -1,7 +1,7 @@
 ﻿using TextScraper;
 using Xunit;
 
-namespace TextScraperTest
+namespace TextScraperTests
 {
     public class ScrapePatternTest
     {

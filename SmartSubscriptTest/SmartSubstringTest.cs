@@ -61,5 +61,33 @@ namespace TextScraperTests
 
             Assert.Throws<ArgumentOutOfRangeException>(() => _sut.Substring(_text.Length, 1));
         }
+
+        [Theory]
+        [InlineData("0",0)]
+        [InlineData("10",10)]
+        [InlineData("2",2)]
+        [InlineData("123",123)]
+        [InlineData("-10",-10)]
+        public void ToIntShouldParseAnIntCorrectly(string text, int number)
+        {
+            var sub = new SmartSubstring(text);
+
+            Assert.Equal(number, sub.ToInt());
+        }
+
+        [Theory]
+        [InlineData("0.0",0.0)]
+        [InlineData("1.3",1.3)]
+        [InlineData("-3",-3)]
+        [InlineData("-3.2",-3.2)]
+        [InlineData("-2.<sub>96</sub>",-2.96)]
+        public void ToDoubleShouldParseAnDoubleCorrectly(string text, double number)
+        {
+            const double precision = 0.00001;
+
+            var sub = new SmartSubstring(text);
+
+            Assert.InRange(sub.ToDouble(), number - precision, number + precision);
+        }
     }
 }

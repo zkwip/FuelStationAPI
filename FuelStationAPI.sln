@@ -9,9 +9,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{8BF4B508
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{EB972A56-7B99-4006-B2DF-D3286AF6A0A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextScraper", "TextScraper\TextScraper.csproj", "{15825322-A210-4E75-9474-654D9D0D6880}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextScraper", "TextScraper\TextScraper.csproj", "{15825322-A210-4E75-9474-654D9D0D6880}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextScraperTest", "SmartSubscriptTest\TextScraperTest.csproj", "{5B0CA310-8B6D-4A69-B315-FE47A00B5C91}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextScraperTests", "SmartSubscriptTest\TextScraperTests.csproj", "{5B0CA310-8B6D-4A69-B315-FE47A00B5C91}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

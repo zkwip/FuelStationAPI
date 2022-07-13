@@ -1,7 +1,11 @@
-﻿namespace TextScraper
+﻿using System.Globalization;
+using System.Text.RegularExpressions;
+
+namespace TextScraper
 {
     public struct SmartSubstring
     {
+        private static readonly Regex _numberRegex = new("<[^>]*>|[^0-9.,-]");
         private readonly string _text;
         private readonly int _start;
         private readonly int _length;
@@ -36,5 +40,17 @@
         }
 
         public override string ToString() => AsSpan().ToString();
+
+        public int ToInt()
+        {
+            string str = _numberRegex.Replace(ToString(), "");
+            return int.Parse(str);
+        }
+
+        public double ToDouble(string locale = "en-US")
+        {
+            string str = _numberRegex.Replace(ToString(), "");
+            return double.Parse(str, CultureInfo.CreateSpecificCulture(locale));
+        }
     }
 }

@@ -1,11 +1,7 @@
-﻿using System.Globalization;
-using System.Text.RegularExpressions;
-
-namespace TextScraper
+﻿namespace TextScraper
 {
     public class Scraper
     {
-        private static readonly Regex _numberRegex = new("<[^>]*>|[^0-9.,]");
         private SmartSubstring _text;
 
         public Scraper(string text)
@@ -20,7 +16,7 @@ namespace TextScraper
 
         private ReadOnlySpan<char> TextSpan => _text.AsSpan();
 
-        public bool TestReadTo(string handle) => TextSpan.IndexOf(handle) >= 0;
+        public bool Contains(string handle) => TextSpan.IndexOf(handle) >= 0;
 
         public SmartSubstring ReadTo(string handle)
         {
@@ -32,6 +28,8 @@ namespace TextScraper
 
             return res;
         }
+
+        public SmartSubstring GetRemainingText() => _text;
 
         public void SkipTo(string handle)
         {
@@ -47,28 +45,6 @@ namespace TextScraper
                 throw new ScrapeException("Could not find the handle in the string: " + handle);
 
             return start;
-        }
-
-        public double ReadDecimalTo(string handle)
-        {
-            string textToParse = ReadTo(handle).ToString();
-            textToParse = _numberRegex.Replace(textToParse, "");
-
-            if (double.TryParse(textToParse, NumberStyles.AllowDecimalPoint, CultureInfo.CreateSpecificCulture("en-US"), out double value))
-                return value;
-
-            throw new ScrapeException("The string \"" + textToParse + "\" does not parse as a number");
-        }
-
-        public double ReadCommaDecimalTo(string handle)
-        {
-            string textToParse = ReadTo(handle).ToString();
-            textToParse = _numberRegex.Replace(textToParse, "");
-
-            if (double.TryParse(textToParse, NumberStyles.AllowDecimalPoint, CultureInfo.CreateSpecificCulture("fr-FR"), out double value))
-                return value;
-
-            throw new ScrapeException("The string \"" + textToParse + "\" does not parse as a number");
         }
     }
 
