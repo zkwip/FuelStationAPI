@@ -22,7 +22,7 @@ namespace TextScraperTests
                 .AddGetter("name")
                 .AddHandle("!");
 
-            var result = pattern.Run(_scraper);
+            var result = pattern.RunOn(_scraper);
             var text = result["name"].ToString();
 
             Assert.Equal("ScrapePatternTest", text);
@@ -39,7 +39,7 @@ namespace TextScraperTests
                 .AddGetter("name")
                 .AddHandle("!");
 
-            var result = pattern.Run(_scraper);
+            var result = pattern.RunOn(_scraper);
 
             Assert.Equal("world", result["planet"].ToString());
             Assert.Equal("ScrapePatternTest", result["name"].ToString());

@@ -39,7 +39,7 @@
             return this;
         }
 
-        public ScrapeResult Run(Scraper scraper)
+        public ScrapeResult RunOn(Scraper scraper)
         {
             Dictionary<string, SmartSubstring> result = new();
 
