@@ -1,23 +1,23 @@
 ﻿using System.Globalization;
 using System.Text.RegularExpressions;
 
-namespace TextScraper
+namespace TextScanner
 {
-    public struct SmartSubstring
+    public struct ManagedTextSpan
     {
         private static readonly Regex _numberRegex = new("<[^>]*>|[^0-9.,-]");
         private readonly string _text;
         private readonly int _start;
         private readonly int _length;
 
-        public SmartSubstring(string text)
+        public ManagedTextSpan(string text)
         {
             _text = text;
             _start = 0;
             _length = text.Length;
         }
 
-        private SmartSubstring(string text, int start, int length)
+        private ManagedTextSpan(string text, int start, int length)
         {
             _text = text;
             _start = start;
@@ -26,9 +26,9 @@ namespace TextScraper
 
         public ReadOnlySpan<char> AsSpan() => _text.AsSpan(_start, _length);
 
-        public SmartSubstring Substring(int start) => Substring(start, _length - start);
+        public ManagedTextSpan Substring(int start) => Substring(start, _length - start);
 
-        public SmartSubstring Substring(int start, int length)
+        public ManagedTextSpan Substring(int start, int length)
         {
             if (start < 0 || start > _length)
                 throw new ArgumentOutOfRangeException(nameof(start));

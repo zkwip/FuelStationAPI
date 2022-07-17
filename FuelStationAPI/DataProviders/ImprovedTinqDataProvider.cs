@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
-using TextScraper;
+using TextScanner;
 
 namespace FuelStationAPI.DataProviders
 {
@@ -15,13 +15,13 @@ namespace FuelStationAPI.DataProviders
 
         public override IEnumerable<FuelStationData> ExtractStations(string msg)
         {
-            ScrapePattern pattern = ScrapePattern.Create()
+            ScanPattern pattern = ScanPattern.Create()
                 .AddEnclosedGetter("lat", "data-lat=\"", "\"")
                 .AddEnclosedGetter("lng", "data-lng=\"", "\"")
                 .AddEnclosedGetter("name", "<span class=\"field-content\"><h2>", "</h2>")
                 .AddEnclosedGetter("identifier", "<span class=\"field-content\"><a href=\"/tankstations/", "#default");
 
-            Scraper scraper = new(msg);
+            TextScanner.TextScanner scraper = new(msg);
             List<FuelStationData> res = new();
 
             while (true)
@@ -56,12 +56,12 @@ namespace FuelStationAPI.DataProviders
 
         private static void ExtractPrice(string msg, List<FuelPriceResult> prices, string handle, FuelType type)
         {
-            Scraper scraper = new(msg);
+            TextScanner.TextScanner scraper = new(msg);
 
             const string pricePrefix = "<div content=\"";
             const string priceSuffix = "\" class=\"field field--name-field-prices-price-pump field--type-float field--label-hidden field__item\">";
 
-            ScrapeResult result = ScrapePattern.Create()
+            ScanResult result = ScanPattern.Create()
                 .AddHandle("<div class=\"node node--type-price node--view-mode-default taxonomy-term-" + handle + " ds-1col clearfix\">")
                 .AddEnclosedGetter("price", pricePrefix, priceSuffix)
                 .RunOn(scraper);

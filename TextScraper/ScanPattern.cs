@@ -1,25 +1,25 @@
-﻿namespace TextScraper
+﻿namespace TextScanner
 {
-    public class ScrapePattern : IExtendableScrapePattern
+    public class ScanPattern : IExtendableScanPattern
     {
         private readonly List<string> _handles;
         private readonly Dictionary<int, string> _names;
 
         private bool BreakOnMissedHandle;
 
-        private ScrapePattern(bool breakOnStepFail = true)
+        private ScanPattern(bool breakOnStepFail = true)
         {
             _names = new Dictionary<int, string>();
             _handles = new List<string>();
             BreakOnMissedHandle = breakOnStepFail;
         }
 
-        public static IExtendableScrapePattern Create()
+        public static IExtendableScanPattern Create()
         {
-            return new ScrapePattern();
+            return new ScanPattern();
         }
 
-        public ScrapePattern AddEnclosedGetter(string name, string prefix, string suffix)
+        public ScanPattern AddEnclosedGetter(string name, string prefix, string suffix)
         {
             _handles.Add(prefix);
             _names.Add(_handles.Count, name);
@@ -27,21 +27,21 @@
             return this;
         }
 
-        public ScrapePattern AddHandle(string handle)
+        public ScanPattern AddHandle(string handle)
         {
             _handles.Add(handle);
             return this;
         }
 
-        public IOpenScrapePattern AddGetter(string name)
+        public IOpenScanPattern AddGetter(string name)
         {
             _names.Add(_handles.Count, name);
             return this;
         }
 
-        public ScrapeResult RunOn(Scraper scraper)
+        public ScanResult RunOn(TextScanner scraper)
         {
-            Dictionary<string, SmartSubstring> result = new();
+            Dictionary<string, ManagedTextSpan> result = new();
 
             for (int i = 0; i < _handles.Count; i++)
             {
@@ -54,7 +54,7 @@
             return new(result);
         }
 
-        private bool StepOverHandles(Scraper scraper, Dictionary<string, SmartSubstring> result, int index)
+        private bool StepOverHandles(TextScanner scraper, Dictionary<string, ManagedTextSpan> result, int index)
         {
             string handle = _handles[index];
 
@@ -72,14 +72,14 @@
         }
     }
 
-    public interface IOpenScrapePattern
+    public interface IOpenScanPattern
     {
-        ScrapePattern AddHandle(string handle);
-        ScrapePattern AddEnclosedGetter(string name, string prefix, string suffix);
+        ScanPattern AddHandle(string handle);
+        ScanPattern AddEnclosedGetter(string name, string prefix, string suffix);
     }
 
-    public interface IExtendableScrapePattern : IOpenScrapePattern
+    public interface IExtendableScanPattern : IOpenScanPattern
     {
-        IOpenScrapePattern AddGetter(string name);
+        IOpenScanPattern AddGetter(string name);
     }
 }

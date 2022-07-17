@@ -1,18 +1,18 @@
 using System;
-using TextScraper;
+using TextScanner;
 using Xunit;
 
-namespace TextScraperTests
+namespace TextScannerTests
 {
-    public class SmartSubstringTest
+    public class ManagedTextSpanTest
     {
         private readonly string _text = "hello how are you";
 
-        private readonly SmartSubstring _sut;
+        private readonly ManagedTextSpan _sut;
 
-        public SmartSubstringTest()
+        public ManagedTextSpanTest()
         {
-            _sut = new SmartSubstring(_text);
+            _sut = new ManagedTextSpan(_text);
         }
 
 
@@ -70,7 +70,7 @@ namespace TextScraperTests
         [InlineData("-10",-10)]
         public void ToIntShouldParseAnIntCorrectly(string text, int number)
         {
-            var sub = new SmartSubstring(text);
+            var sub = new ManagedTextSpan(text);
 
             Assert.Equal(number, sub.ToInt());
         }
@@ -85,7 +85,7 @@ namespace TextScraperTests
         {
             const double precision = 0.00001;
 
-            var sub = new SmartSubstring(text);
+            var sub = new ManagedTextSpan(text);
 
             Assert.InRange(sub.ToDouble(), number - precision, number + precision);
         }

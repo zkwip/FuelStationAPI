@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
-using TextScraper;
+using TextScanner;
 
 namespace FuelStationAPI.DataSources
 {
@@ -31,7 +31,7 @@ namespace FuelStationAPI.DataSources
             if (body is null) 
                 return new(station, new Exception("Could not read the station page"));
 
-            var scraper = new Scraper(body);
+            var scraper = new TextScanner.TextScanner(body);
             return _definition.Scrape(scraper);
 
         }

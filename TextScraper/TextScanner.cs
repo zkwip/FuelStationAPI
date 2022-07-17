@@ -1,15 +1,15 @@
-﻿namespace TextScraper
+﻿namespace TextScanner
 {
-    public class Scraper
+    public class TextScanner
     {
-        private SmartSubstring _text;
+        private ManagedTextSpan _text;
 
-        public Scraper(string text)
+        public TextScanner(string text)
         {
-            _text = new SmartSubstring(text);
+            _text = new ManagedTextSpan(text);
         }
 
-        public Scraper(SmartSubstring text)
+        public TextScanner(ManagedTextSpan text)
         {
             _text = text;
         }
@@ -18,18 +18,18 @@
 
         public bool Contains(string handle) => TextSpan.IndexOf(handle) >= 0;
 
-        public SmartSubstring ReadTo(string handle)
+        public ManagedTextSpan ReadTo(string handle)
         {
             int start = FindStartOfSubstring(handle);
             int end = start + handle.Length;
 
-            SmartSubstring res = _text.Substring(0, start);
+            ManagedTextSpan res = _text.Substring(0, start);
             _text = _text.Substring(end);
 
             return res;
         }
 
-        public SmartSubstring GetRemainingText() => _text;
+        public ManagedTextSpan GetRemainingText() => _text;
 
         public void SkipTo(string handle)
         {

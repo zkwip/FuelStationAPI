@@ -1,28 +1,28 @@
-﻿namespace TextScraper
+﻿namespace TextScanner
 {
-    public class ScrapeResult
+    public class ScanResult
     {
-        private readonly Dictionary<string, SmartSubstring>? _resultData;
+        private readonly Dictionary<string, ManagedTextSpan>? _resultData;
 
         public readonly Boolean Succes;
         public readonly string Message;
 
-        public ScrapeResult(Dictionary<string, SmartSubstring> resultData)
+        public ScanResult(Dictionary<string, ManagedTextSpan> resultData)
         {
             _resultData = resultData;
             Succes = true;
             Message = "Succes";
         }
 
-        public ScrapeResult(string msg)
+        public ScanResult(string msg)
         {
             Succes = false;
             Message = msg;
         }
 
-        public SmartSubstring this[string name] => TryGet(name);
+        public ManagedTextSpan this[string name] => TryGet(name);
 
-        private SmartSubstring TryGet(string name)
+        private ManagedTextSpan TryGet(string name)
         {
             if (!Succes)
                 throw new InvalidOperationException("Tried to read data from failed scrape result");

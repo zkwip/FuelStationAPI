@@ -1,16 +1,16 @@
 ﻿using Xunit;
-using TextScraper;
+using TextScanner;
 
-namespace TextScraperTests
+namespace TextScannerTests
 {
-    public class ScraperTest
+    public class TextScannerTest
     {
-        private readonly string _text = "Hello world, this is the ScraperTest test string";
-        private readonly Scraper _sut;
+        private readonly string _text = "Hello world, this is the TextScannerTest test string";
+        private readonly TextScanner.TextScanner _sut;
 
-        public ScraperTest()
+        public TextScannerTest()
         {
-            _sut  = new Scraper(_text);
+            _sut = new TextScanner.TextScanner(_text);
         }
 
         [Fact]
@@ -22,21 +22,21 @@ namespace TextScraperTests
         [Fact]
         public void ReadToShouldReturnUpToTheHandle()
         {
-            var res = _sut.ReadTo("ScraperTest");
+            var res = _sut.ReadTo("TextScannerTest");
             Assert.Equal("Hello world, this is the ", res.ToString());
         }
 
         [Fact]
         public void ReadToShouldMoveTrimTheRest()
         {
-            _sut.ReadTo("ScraperTest");
+            _sut.ReadTo("TextScannerTest");
             Assert.Equal(" test string", _sut.GetRemainingText().ToString());
         }
 
         [Fact]
         public void SkipToShouldMoveTrimTheRest()
         {
-            _sut.SkipTo("ScraperTest");
+            _sut.SkipTo("TextScannerTest");
             Assert.Equal(" test string", _sut.GetRemainingText().ToString());
         }
 
