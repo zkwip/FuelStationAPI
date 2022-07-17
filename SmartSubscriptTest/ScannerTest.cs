@@ -3,14 +3,14 @@ using TextScanner;
 
 namespace TextScannerTests
 {
-    public class TextScannerTest
+    public class ScannerTest
     {
         private readonly string _text = "Hello world, this is the TextScannerTest test string";
-        private readonly TextScanner.TextScanner _sut;
+        private readonly Scanner _sut;
 
-        public TextScannerTest()
+        public ScannerTest()
         {
-            _sut = new TextScanner.TextScanner(_text);
+            _sut = new Scanner(_text);
         }
 
         [Fact]

@@ -7,11 +7,11 @@ namespace TextScannerTests
     {
         private readonly string _text = "Hello world, my name is ScanPatternTest! how are you doing today?";
 
-        private readonly TextScanner.TextScanner _scanner;
+        private readonly Scanner _scanner;
 
         public ScanPatternTest()
         {
-            _scanner = new TextScanner.TextScanner(_text);
+            _scanner = new Scanner(_text);
         }
 
         [Fact]

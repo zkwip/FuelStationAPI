@@ -1,15 +1,15 @@
 ﻿namespace TextScanner
 {
-    public class TextScanner
+    public class Scanner
     {
         private ManagedTextSpan _text;
 
-        public TextScanner(string text)
+        public Scanner(string text)
         {
             _text = new ManagedTextSpan(text);
         }
 
-        public TextScanner(ManagedTextSpan text)
+        public Scanner(ManagedTextSpan text)
         {
             _text = text;
         }

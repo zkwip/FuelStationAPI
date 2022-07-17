@@ -39,7 +39,7 @@
             return this;
         }
 
-        public ScanResult RunOn(TextScanner scraper)
+        public ScanResult RunOn(Scanner scraper)
         {
             Dictionary<string, ManagedTextSpan> result = new();
 
@@ -54,7 +54,7 @@
             return new(result);
         }
 
-        private bool StepOverHandles(TextScanner scraper, Dictionary<string, ManagedTextSpan> result, int index)
+        private bool StepOverHandles(Scanner scraper, Dictionary<string, ManagedTextSpan> result, int index)
         {
             string handle = _handles[index];
 

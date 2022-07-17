@@ -20,7 +20,7 @@ namespace FuelStationAPI.DataSources
 
         public string GetUrl(FuelStationData station) => _urlBuilder.Invoke(station);
 
-        public FuelStationScrapeResult Scrape(TextScanner.TextScanner scraper) => _stationMapper.Map(_stationPattern.RunOn(scraper));
+        public FuelStationScrapeResult Scrape(TextScanner.Scanner scraper) => _stationMapper.Map(_stationPattern.RunOn(scraper));
 
     }
 }
