@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TextScanner\TextScanner.csproj" />
     <ProjectReference Include="..\TextScraper\TextScanner.csproj" />
   </ItemGroup>
 
