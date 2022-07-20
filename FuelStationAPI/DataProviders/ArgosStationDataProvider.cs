@@ -11,9 +11,9 @@ namespace FuelStationAPI.DataProviders
             _stationDetailUrlPrefix = "https://www.argos.nl/tankstation/";
             _stationListUrl = "https://www.argos.nl/tankstations/";
         }
-        public override IEnumerable<FuelStationData> ExtractStations(string msg)
+        public override IEnumerable<FuelStationIdentifier> ExtractStations(string msg)
         {
-            List<FuelStationData> list = new();
+            List<FuelStationIdentifier> list = new();
             StringScraper scraper = new(msg);
 
             scraper.ReadTo("<div id=\"tankstation-map\">");
@@ -37,7 +37,7 @@ namespace FuelStationAPI.DataProviders
                     scraper.ReadTo("<a href=\"https://www.argos.nl/tankstation/");
                     string ident = scraper.ReadTo("\">Bekijk</a>");
 
-                    list.Add(new FuelStationData("Argos", ident, name, new(lat, lng)));
+                    list.Add(new FuelStationIdentifier("Argos", ident, name, new(lat, lng)));
                 }
                 catch (ScrapeException)
                 {

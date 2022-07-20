@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FuelStationAPI.Controllers
 {
-    [ApiController]
-    [Route("[controller]")]
+    //[ApiController]
+    //[Route("[controller]")]
     public class FuelStationController : ControllerBase
     {
         private readonly ILogger<FuelStationController> _logger;
@@ -30,7 +30,7 @@ namespace FuelStationAPI.Controllers
             if (geoSucces)
                 _location = new Geolocation(latitude, longtitude);
 
-            IEnumerable<FuelStationData> stations = await ListFilteredStationsAsync();
+            IEnumerable<FuelStationIdentifier> stations = await ListFilteredStationsAsync();
 
             if (fuelRemSucces && geoSucces)
                 return await CompareIncludingDistance(_location, fuelRemaining, stations);
@@ -42,21 +42,21 @@ namespace FuelStationAPI.Controllers
         }
 
         [HttpGet("ListAllStations")]
-        public async Task<IEnumerable<FuelStationData>> ListAllStationsAsync()
+        public async Task<IEnumerable<FuelStationIdentifier>> ListAllStationsAsync()
         {
-            IEnumerable<FuelStationData>[] lists = await Task.WhenAll(_scrapers.Select(x => x.ScrapeStationListAsync()));
+            IEnumerable<FuelStationIdentifier>[] lists = await Task.WhenAll(_scrapers.Select(x => x.ScrapeStationListAsync()));
             return lists.SelectMany(x => x);
         }
 
         [HttpGet("ListFilteredStations")]
-        public async Task<IEnumerable<FuelStationData>> ListFilteredStationsAsync()
+        public async Task<IEnumerable<FuelStationIdentifier>> ListFilteredStationsAsync()
         {
-            IEnumerable<FuelStationData> list = await ListAllStationsAsync();
+            IEnumerable<FuelStationIdentifier> list = await ListAllStationsAsync();
             list = list.Where(x => Geolocation.Distance(x.Location, _location) < 15);
             return list;
         }
 
-        private async Task<FuelCostComparison> ComparePricesOnly(IEnumerable<FuelStationData> stations, FuelType type = FuelType.Euro95_E10)
+        private async Task<FuelCostComparison> ComparePricesOnly(IEnumerable<FuelStationIdentifier> stations, FuelType type = FuelType.Euro95_E10)
         {
             IEnumerable<FuelStationScrapeResult> scrapes = await ScrapeStations(stations);
             return new FuelCostComparison(scrapes, r => GetFuelPrice(type,r));
@@ -71,12 +71,12 @@ namespace FuelStationAPI.Controllers
             return -1;
         }
 
-        private async Task<IEnumerable<FuelStationScrapeResult>> ScrapeStations(IEnumerable<FuelStationData> stations)
+        private async Task<IEnumerable<FuelStationScrapeResult>> ScrapeStations(IEnumerable<FuelStationIdentifier> stations)
         {
             List<Task<FuelStationScrapeResult?>> scrapeTasks = new();
             List<FuelStationScrapeResult> res = new();
 
-            foreach (FuelStationData station in stations)
+            foreach (FuelStationIdentifier station in stations)
                 scrapeTasks.Add(ScrapeStation(station));
 
             foreach (FuelStationScrapeResult? r in await Task.WhenAll(scrapeTasks))
@@ -86,7 +86,7 @@ namespace FuelStationAPI.Controllers
             return res;
         }
 
-        private async Task<FuelStationScrapeResult?> ScrapeStation(FuelStationData station)
+        private async Task<FuelStationScrapeResult?> ScrapeStation(FuelStationIdentifier station)
         {
             foreach (IFuelStationDataProvider scraper in _scrapers)
             {
@@ -99,12 +99,12 @@ namespace FuelStationAPI.Controllers
             return null;
         }
 
-        private Task<FuelCostComparison> CompareIncludingDistance(Geolocation geolocation, IEnumerable<FuelStationData> stations)
+        private Task<FuelCostComparison> CompareIncludingDistance(Geolocation geolocation, IEnumerable<FuelStationIdentifier> stations)
         {
             return ComparePricesOnly(stations);
         }
 
-        private Task<FuelCostComparison> CompareIncludingDistance(Geolocation geolocation, double fuelRemaining, IEnumerable<FuelStationData> stations)
+        private Task<FuelCostComparison> CompareIncludingDistance(Geolocation geolocation, double fuelRemaining, IEnumerable<FuelStationIdentifier> stations)
         {
             return ComparePricesOnly(stations);
         }

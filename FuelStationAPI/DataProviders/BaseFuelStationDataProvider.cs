@@ -21,7 +21,7 @@ namespace FuelStationAPI.DataProviders
             _memoryCache = memoryCache;
         }
 
-        public virtual async Task<IEnumerable<FuelStationData>> ScrapeStationListAsync()
+        public virtual async Task<IEnumerable<FuelStationIdentifier>> ScrapeStationListAsync()
         {
             return await _memoryCache.GetOrCreateAsync(StationProviderName, async entry => {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(2);
@@ -29,7 +29,7 @@ namespace FuelStationAPI.DataProviders
             });
         }
 
-        private async Task<IEnumerable<FuelStationData>> QueryStationsAsync()
+        private async Task<IEnumerable<FuelStationIdentifier>> QueryStationsAsync()
         {
             using HttpResponseMessage message = await _httpClient.GetAsync(_stationListUrl);
             string msg = await message.Content.ReadAsStringAsync();
@@ -38,19 +38,19 @@ namespace FuelStationAPI.DataProviders
 
         protected abstract string StationProviderName { get; }
 
-        public bool StationDataSourceCheck(FuelStationData station) => (station.DataPrivider.ToLower() == StationProviderName);
+        public bool StationDataSourceCheck(FuelStationIdentifier station) => (station.DataPrivider.ToLower() == StationProviderName);
 
-        public abstract IEnumerable<FuelStationData> ExtractStations(string msg);
+        public abstract IEnumerable<FuelStationIdentifier> ExtractStations(string msg);
 
-        public virtual async Task<FuelStationScrapeResult> ScrapeStationPricesAsync(FuelStationData station)
+        public virtual async Task<FuelStationScrapeResult> ScrapeStationPricesAsync(FuelStationIdentifier station)
         {
             return await _memoryCache.GetOrCreateAsync(station, async entry => {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
-                return await QueryStationPricesAsync((FuelStationData)entry.Key);
+                return await QueryStationPricesAsync((FuelStationIdentifier)entry.Key);
             });
         }
 
-        public virtual async Task<FuelStationScrapeResult> QueryStationPricesAsync(FuelStationData station)
+        public virtual async Task<FuelStationScrapeResult> QueryStationPricesAsync(FuelStationIdentifier station)
         {
             string url = _stationDetailUrlPrefix + station.Identifier;
             using HttpResponseMessage message = await _httpClient.GetAsync(url);

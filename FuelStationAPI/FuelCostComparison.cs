@@ -22,11 +22,11 @@
 
     public class FuelCostComparisonItem
     {
-        public FuelStationData Station { get; }
+        public FuelStationIdentifier Station { get; }
 
         public double Cost { get; }
 
-        public FuelCostComparisonItem(FuelStationData station, double cost)
+        public FuelCostComparisonItem(FuelStationIdentifier station, double cost)
         {
             Station = station;
             Cost = cost;

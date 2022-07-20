@@ -2,8 +2,8 @@
 {
     public interface IFuelStationDataProvider
     {
-        Task<IEnumerable<FuelStationData>> ScrapeStationListAsync();
-        Task<FuelStationScrapeResult> ScrapeStationPricesAsync(FuelStationData station);
-        bool StationDataSourceCheck(FuelStationData station);
+        Task<IEnumerable<FuelStationIdentifier>> ScrapeStationListAsync();
+        Task<FuelStationScrapeResult> ScrapeStationPricesAsync(FuelStationIdentifier station);
+        bool StationDataSourceCheck(FuelStationIdentifier station);
     }
 }

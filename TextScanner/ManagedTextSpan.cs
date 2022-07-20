@@ -17,6 +17,8 @@ namespace TextScanner
             _length = text.Length;
         }
 
+        public MappedScanResult<T> MapWith<T>(ITextSpanMapper<T> mapper) => mapper.Map(this);
+
         private ManagedTextSpan(string text, int start, int length)
         {
             _text = text;

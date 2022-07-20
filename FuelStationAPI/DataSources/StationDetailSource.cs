@@ -3,20 +3,27 @@ using TextScanner;
 
 namespace FuelStationAPI.DataSources
 {
-    public class StationDetailSource : IFuelStationDataSource
+    public class StationDetailSource : IFuelPriceDataSource
     {
         private readonly HttpClient _httpClient;
         private readonly IMemoryCache _memoryCache;
-        private readonly StationSourceDefinition _definition;
 
-        public StationDetailSource(HttpClient httpClient, IMemoryCache memoryCache, StationSourceDefinition definition)
+        private readonly string _providerName;
+        private readonly ITextSpanMapper<List<FuelPriceResult>> _mapper;
+        private readonly Func<FuelStationIdentifier, string> _urlBuilder;
+
+        public string DataProvider => _providerName;
+
+        public StationDetailSource(HttpClient httpClient, IMemoryCache memoryCache, ITextSpanMapper<List<FuelPriceResult>> mapper, Func<FuelStationIdentifier, string> urlBuilder, string providerName)
         {
             _httpClient = httpClient;
             _memoryCache = memoryCache;
-            _definition = definition;
+            _mapper = mapper;
+            _urlBuilder = urlBuilder;
+            _providerName = providerName;
         }
 
-        public async Task<FuelStationScrapeResult> GetPricesAsync(FuelStationData station)
+        public async Task<MappedScanResult<List<FuelPriceResult>>> GetPricesAsync(FuelStationIdentifier station)
         {
             return await _memoryCache.GetOrCreateAsync(station, async entry => {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(2);
@@ -24,15 +31,14 @@ namespace FuelStationAPI.DataSources
             });
         }
 
-        private async Task<FuelStationScrapeResult> QueryStationPricesAsync(FuelStationData station)
+        private async Task<MappedScanResult<List<FuelPriceResult>>> QueryStationPricesAsync(FuelStationIdentifier station)
         {
-            var body = await GetHttpBodyAsync(_definition.GetUrl(station));
+            var body = await GetHttpBodyAsync(GetUrl(station));
 
-            if (body is null) 
-                return new(station, new Exception("Could not read the station page"));
+            if (body is null)
+                return MappedScanResult<List<FuelPriceResult>>.Fail("The HTTP request failed");
 
-            var scraper = new Scanner(body);
-            return _definition.Scrape(scraper);
+            return _mapper.Map(new(body));
 
         }
         
@@ -44,5 +50,6 @@ namespace FuelStationAPI.DataSources
 
             return await message.Content.ReadAsStringAsync();
         }
+        private string GetUrl(FuelStationIdentifier station) => _urlBuilder.Invoke(station);
     }
 }

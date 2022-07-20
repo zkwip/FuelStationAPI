@@ -12,9 +12,9 @@ namespace FuelStationAPI.DataProviders
 
         protected override string StationProviderName => "carbu";
 
-        public override IEnumerable<FuelStationData> ExtractStations(string msg)
+        public override IEnumerable<FuelStationIdentifier> ExtractStations(string msg)
         {
-            List<FuelStationData> list = new();
+            List<FuelStationIdentifier> list = new();
             StringScraper scraper = new(msg);
 
             while (true)
@@ -36,7 +36,7 @@ namespace FuelStationAPI.DataProviders
                     scraper.ReadTo("data-link=\"https://carbu.com/belgie/index.php/station/");
                     string ident = scraper.ReadTo("\"");
 
-                    list.Add(new FuelStationData("carbu", ident, name, new(lat, lng)));
+                    list.Add(new FuelStationIdentifier("carbu", ident, name, new(lat, lng)));
                 }
                 catch (ScrapeException)
                 {

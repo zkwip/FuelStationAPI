@@ -10,13 +10,13 @@ namespace FuelStationAPI.DataProviders
             _stationDetailUrlPrefix = @"https://www.tango.nl/stations/";
         }
 
-        public async override Task<IEnumerable<FuelStationData>> ScrapeStationListAsync()
+        public async override Task<IEnumerable<FuelStationIdentifier>> ScrapeStationListAsync()
         {
-            FuelStationData[] stations = { new FuelStationData("tango", "tango-eindhoven-kennedylaan", "Tango Eindhoven Kennedylaan", Geolocation.Strijp) };
+            FuelStationIdentifier[] stations = { new FuelStationIdentifier("tango", "tango-eindhoven-kennedylaan", "Tango Eindhoven Kennedylaan", Geolocation.Strijp) };
             return stations.AsEnumerable();
         }
 
-        public async override Task<FuelStationScrapeResult> ScrapeStationPricesAsync(FuelStationData station)
+        public async override Task<FuelStationScrapeResult> ScrapeStationPricesAsync(FuelStationIdentifier station)
         {
             string url = _stationDetailUrlPrefix + station.Identifier;
             HttpResponseMessage message = await _httpClient.GetAsync(url);
@@ -63,7 +63,7 @@ namespace FuelStationAPI.DataProviders
 
         protected override string StationProviderName => "tango";
 
-        public override IEnumerable<FuelStationData> ExtractStations(string msg)
+        public override IEnumerable<FuelStationIdentifier> ExtractStations(string msg)
         {
             throw new NotImplementedException();
         }

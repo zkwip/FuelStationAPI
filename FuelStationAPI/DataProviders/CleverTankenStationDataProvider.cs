@@ -10,9 +10,9 @@ namespace FuelStationAPI.DataProviders
             _stationListUrl = "https://www.clever-tanken.de/tankstelle_liste?lat=51.808520305084&lon=5.96523930478924&ort=47559+Kranenburg%2FWyler&spritsorte=5&r=15";
         }
 
-        public override IEnumerable<FuelStationData> ExtractStations(string msg)
+        public override IEnumerable<FuelStationIdentifier> ExtractStations(string msg)
         {
-            List<FuelStationData> list = new();
+            List<FuelStationIdentifier> list = new();
             List<Geolocation> locations = new();
             StringScraper scraper = new(msg);
 
@@ -56,7 +56,7 @@ namespace FuelStationAPI.DataProviders
                     if (id >= locations.Count) 
                         throw new ScrapeException("The number of scraped locations does not match the number of stations");
 
-                    list.Add(new FuelStationData("CleverTanken", ident, name + " " + address, locations[id]));
+                    list.Add(new FuelStationIdentifier("CleverTanken", ident, name + " " + address, locations[id]));
 
                     id++;
                 }

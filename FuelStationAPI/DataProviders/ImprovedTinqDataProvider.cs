@@ -13,7 +13,7 @@ namespace FuelStationAPI.DataProviders
 
         protected override string StationProviderName => "tinq";
 
-        public override IEnumerable<FuelStationData> ExtractStations(string msg)
+        public override IEnumerable<FuelStationIdentifier> ExtractStations(string msg)
         {
             ScanPattern pattern = ScanPattern.Create()
                 .AddEnclosedGetter("lat", "data-lat=\"", "\"")
@@ -22,7 +22,7 @@ namespace FuelStationAPI.DataProviders
                 .AddEnclosedGetter("identifier", "<span class=\"field-content\"><a href=\"/tankstations/", "#default");
 
             Scanner scraper = new(msg);
-            List<FuelStationData> res = new();
+            List<FuelStationIdentifier> res = new();
 
             while (true)
             {
@@ -36,7 +36,7 @@ namespace FuelStationAPI.DataProviders
                 var name = result["name"].ToString();
                 var identifier = result["identifier"].ToString();
 
-                FuelStationData station = new("TINQ", identifier, "TINQ " + name, new Geolocation(lat, lng));
+                FuelStationIdentifier station = new("TINQ", identifier, "TINQ " + name, new Geolocation(lat, lng));
 
                 res.Add(station);
             }
@@ -58,12 +58,9 @@ namespace FuelStationAPI.DataProviders
         {
             Scanner scraper = new(msg);
 
-            const string pricePrefix = "<div content=\"";
-            const string priceSuffix = "\" class=\"field field--name-field-prices-price-pump field--type-float field--label-hidden field__item\">";
-
             ScanResult result = ScanPattern.Create()
                 .AddHandle("<div class=\"node node--type-price node--view-mode-default taxonomy-term-" + handle + " ds-1col clearfix\">")
-                .AddEnclosedGetter("price", pricePrefix, priceSuffix)
+                .AddEnclosedGetter("price", "<div content=\"", "\" class=\"field field--name-field-prices-price-pump field--type-float field--label-hidden field__item\">")
                 .RunOn(scraper);
 
             if (result.Succes)

@@ -8,9 +8,9 @@
 
         public String FaultMessage { get; }
 
-        public FuelStationData Station { get; }
+        public FuelStationIdentifier Station { get; }
 
-        public FuelStationScrapeResult(FuelStationData station, Exception ex)
+        public FuelStationScrapeResult(FuelStationIdentifier station, Exception ex)
         {
             FaultMessage = ex.Message;
             Succes = false;
@@ -18,7 +18,7 @@
             Station = station;
         }
 
-        public FuelStationScrapeResult(FuelStationData station, IEnumerable<FuelPriceResult> fuelPrices)
+        public FuelStationScrapeResult(FuelStationIdentifier station, IEnumerable<FuelPriceResult> fuelPrices)
         {
             FuelPrices = fuelPrices;
             Succes = true;

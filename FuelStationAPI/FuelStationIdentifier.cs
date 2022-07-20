@@ -1,6 +1,6 @@
 ﻿namespace FuelStationAPI
 {
-    public class FuelStationData
+    public class FuelStationIdentifier
     {
         public string DataPrivider { get; set; }
 
@@ -10,7 +10,7 @@
 
         public Geolocation Location { get; set; }
 
-        public FuelStationData(string provider, string identifier, string name, Geolocation location)
+        public FuelStationIdentifier(string provider, string identifier, string name, Geolocation location)
         {
             Location = location;
             Identifier = identifier;

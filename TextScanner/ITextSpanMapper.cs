@@ -2,7 +2,7 @@
 {
     public interface ITextSpanMapper<TOut>
     {
-        TOut Map(ManagedTextSpan text);
+        MappedScanResult<TOut> Map(ManagedTextSpan text);
     }
 
     public class DoubleMapper : ITextSpanMapper<double>
@@ -14,35 +14,47 @@
             _locale = locale;
         }
 
-        public double Map(ManagedTextSpan text) => text.ToDouble(_locale);
+        public MappedScanResult<double> Map(ManagedTextSpan text)
+        {
+            try
+            {
+                return new(text.ToDouble(_locale));
+            }
+            catch (Exception ex)
+            {
+                return MappedScanResult<double>.Fail(ex.Message);
+            }
+        }
     }
 
     public class IntMapper : ITextSpanMapper<int>
     {
-        public int Map(ManagedTextSpan text) => text.ToInt();
+
+        public MappedScanResult<int> Map(ManagedTextSpan text)
+        {
+            try
+            {
+                return new(text.ToInt());
+            }
+            catch (Exception ex)
+            {
+                return MappedScanResult<int>.Fail(ex.Message);
+            }
+        }
     }
 
     public class StringMapper : ITextSpanMapper<string>
     {
-        public string Map(ManagedTextSpan text) => text.ToString();
-    }
-
-    public class PatternMapper<TOut> : ITextSpanMapper<TOut>
-    {
-        private readonly ScanPattern _pattern;
-        private readonly IScanResultMapper<TOut> _mapper;
-
-        public PatternMapper(ScanPattern pattern, IScanResultMapper<TOut> mapper)
+        public MappedScanResult<string> Map(ManagedTextSpan text)
         {
-            _pattern = pattern;
-            _mapper = mapper;
-        }
-
-        public TOut Map(ManagedTextSpan text)
-        {
-            var scraper = new Scanner(text);
-            var result = _pattern.RunOn(scraper);
-            return _mapper.Map(result);
+            try
+            {
+                return new(text.ToString());
+            }
+            catch (Exception ex)
+            {
+                return MappedScanResult<string>.Fail(ex.Message);
+            }
         }
     }
 }

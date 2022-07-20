@@ -2,6 +2,6 @@
 {
     public interface IScanResultMapper<TOut>
     {
-        TOut Map(ScanResult scrapeResult);
+        MappedScanResult<TOut> Map(ScanResult scrapeResult);
     }
 }

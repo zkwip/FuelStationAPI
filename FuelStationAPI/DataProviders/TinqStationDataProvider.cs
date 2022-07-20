@@ -12,7 +12,7 @@ namespace FuelStationAPI.DataProviders
 
         protected override string StationProviderName => "tinq";
 
-        public override IEnumerable<FuelStationData> ExtractStations(string msg)
+        public override IEnumerable<FuelStationIdentifier> ExtractStations(string msg)
         {
             const string handle_lat = "data-lat=\"";
             const string handle_lng = "data-lng=\"";
@@ -22,7 +22,7 @@ namespace FuelStationAPI.DataProviders
             const string handle_identifier_end = "#default";
 
             StringScraper scraper = new(msg);
-            List<FuelStationData> res = new();
+            List<FuelStationIdentifier> res = new();
 
             while (true)
             {
@@ -40,7 +40,7 @@ namespace FuelStationAPI.DataProviders
                     scraper.ReadTo(handle_identifier);
                     string identifier = scraper.ReadTo(handle_identifier_end);
 
-                    FuelStationData station = new("TINQ", identifier, "TINQ " + name, new Geolocation(lat, lng));
+                    FuelStationIdentifier station = new("TINQ", identifier, "TINQ " + name, new Geolocation(lat, lng));
                     res.Add(station);
                 }
                 catch (ScrapeException) { break; }
