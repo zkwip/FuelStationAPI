@@ -21,7 +21,7 @@ namespace FuelStationAPI.DataProviders
                 .AddEnclosedGetter("name", "<span class=\"field-content\"><h2>", "</h2>")
                 .AddEnclosedGetter("identifier", "<span class=\"field-content\"><a href=\"/tankstations/", "#default");
 
-            TextScanner.Scanner scraper = new(msg);
+            Scanner scraper = new(msg);
             List<FuelStationData> res = new();
 
             while (true)
@@ -56,7 +56,7 @@ namespace FuelStationAPI.DataProviders
 
         private static void ExtractPrice(string msg, List<FuelPriceResult> prices, string handle, FuelType type)
         {
-            TextScanner.Scanner scraper = new(msg);
+            Scanner scraper = new(msg);
 
             const string pricePrefix = "<div content=\"";
             const string priceSuffix = "\" class=\"field field--name-field-prices-price-pump field--type-float field--label-hidden field__item\">";

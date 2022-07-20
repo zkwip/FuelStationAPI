@@ -31,7 +31,7 @@ namespace FuelStationAPI.DataSources
             if (body is null) 
                 return new(station, new Exception("Could not read the station page"));
 
-            var scraper = new TextScanner.Scanner(body);
+            var scraper = new Scanner(body);
             return _definition.Scrape(scraper);
 
         }

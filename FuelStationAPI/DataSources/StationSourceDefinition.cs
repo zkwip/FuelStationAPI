@@ -8,19 +8,17 @@ namespace FuelStationAPI.DataSources
         private readonly IScanResultMapper<FuelStationScrapeResult> _stationMapper;
 
         private readonly Func<FuelStationData, string> _urlBuilder;
-        private readonly string _name;
 
-        public StationSourceDefinition(Func<FuelStationData, string> urlBuilder, string name, ScanPattern stationPattern, IScanResultMapper<FuelStationScrapeResult> stationMapper)
+        public StationSourceDefinition(Func<FuelStationData, string> urlBuilder, ScanPattern stationPattern, IScanResultMapper<FuelStationScrapeResult> stationMapper)
         {
             _urlBuilder = urlBuilder;
-            _name = name;
             _stationMapper = stationMapper;
             _stationPattern = stationPattern;
         }
 
         public string GetUrl(FuelStationData station) => _urlBuilder.Invoke(station);
 
-        public FuelStationScrapeResult Scrape(TextScanner.Scanner scraper) => _stationMapper.Map(_stationPattern.RunOn(scraper));
+        public FuelStationScrapeResult Scrape(Scanner scraper) => _stationMapper.Map(_stationPattern.RunOn(scraper));
 
     }
 }
