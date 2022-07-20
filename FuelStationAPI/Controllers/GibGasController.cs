@@ -17,7 +17,7 @@ namespace FuelStationAPI.Controllers
         public GibGasController(ILogger<FuelStationController> logger, IEnumerable<IFuelPriceDataSource> fuelPriceDataSources, IEnumerable<IFuelStationDetailSource> stationDetailSources, IEnumerable<IFuelStationListSource> stationListSources)
         {
             _logger = logger;
-            _location = Geolocation.Ooij;
+            _location = Geolocation.Maastricht;
 
             _fuelPriceDataSources = fuelPriceDataSources;
             _stationDetailSources = stationDetailSources;
@@ -26,12 +26,16 @@ namespace FuelStationAPI.Controllers
 
         private readonly Predicate<FuelStationIdentifier> AllStations = s => true;
 
+        [HttpGet("Test")]
+        public string Test() => "Hello";
+
         [HttpGet("GetStations")]
-        public async Task<List<FuelStationIdentifier>> GetStationsAsync(Predicate<FuelStationIdentifier>? which)
+        public async Task<List<FuelStationIdentifier>> GetStationsAsync() => await GetStationsAsync(null);
+
+        private async Task<List<FuelStationIdentifier>> GetStationsAsync(Predicate<FuelStationIdentifier>? which)
         {
             var results = await Task.WhenAll(_stationListSources.Select(x => x.GetStationListAsync()));
             var list = new List<FuelStationIdentifier>();
-
 
             if (which is null)
                 which = AllStations;
@@ -41,7 +45,11 @@ namespace FuelStationAPI.Controllers
                 if (item.Succes)
                 {
                     list.AddRange(item.Result.FindAll(which));
+                    continue;
                 }
+
+                _logger.LogWarning("Empty result detected");
+                   
             }
 
             return list;
@@ -62,21 +70,20 @@ namespace FuelStationAPI.Controllers
             
             if (!prices.Succes)
                 _logger.LogWarning(prices.Message);
-            
-            var list = prices.Result;
+
+            List<FuelPriceResult> list = prices.Result;
 
             if(list.Count == 0)
                 _logger.LogWarning("no prices found for station {0}", station);
 
-
-            return list.FindAll(x => fuels(x.FuelType));
+            return list.FindAll(item => fuels.Invoke(item.FuelType));
         }
 
         [HttpGet("ListFilteredStations")]
         public async Task<IEnumerable<FuelStationIdentifier>> ListFilteredStationsAsync(Predicate<FuelStationIdentifier>? which = null)
         {
             IEnumerable<FuelStationIdentifier> list = await GetStationsAsync(which);
-            list = list.Where(x => Geolocation.Distance(x.Location, _location) < 15);
+            list = list.Where(x => Geolocation.Distance(x.Location, _location) < 30);
             return list;
         }
 
@@ -90,7 +97,7 @@ namespace FuelStationAPI.Controllers
         public async Task<List<FuelStationPricesPair>> GetAllPricesAsync() => await GetAllPricesAsync(null, null);
 
         [HttpGet("GetClosePrices")]
-        public async Task<List<FuelStationPricesPair>> GetClosePricesAsync() => await GetAllPricesAsync(x => Geolocation.Distance(x.Location,_location) < 20.0, null);
+        public async Task<List<FuelStationPricesPair>> GetClosePricesAsync() => await GetAllPricesAsync(x => Geolocation.Distance(x.Location, _location) < 50.0, null);
 
 
         private async Task<List<FuelStationPricesPair>> GetAllPricesAsync(Predicate<FuelStationIdentifier>? which = null, Predicate<FuelType>? fuels = null)

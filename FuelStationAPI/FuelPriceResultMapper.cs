@@ -4,15 +4,28 @@ namespace FuelStationAPI
 {
     internal class FuelPriceResultMapper : IScanResultMapper<FuelPriceResult>
     {
+        private bool _useDecimalCommaInPrice;
+
+        public FuelPriceResultMapper(bool useDecimalCommaPrice)
+        {
+            _useDecimalCommaInPrice = useDecimalCommaPrice;
+        }
 
         public MappedScanResult<FuelPriceResult> Map(ScanResult result)
         {
             if (!result.Succes) return MappedScanResult<FuelPriceResult>.Fail(result.Message);
 
-            var price = result["price"].ToDouble();
-            var type = result["type"].MapWith(new FuelTypeMapper()).Result;
+            try
+            {
+                var price = result["price"].ToDouble(_useDecimalCommaInPrice ? "fr-FR" : "en-US");
+                var type = result["type"].MapWith(new FuelTypeMapper()).Result;
 
-            return new MappedScanResult<FuelPriceResult>(new FuelPriceResult(type, price));
+                return new MappedScanResult<FuelPriceResult>(new FuelPriceResult(type, price));
+            }
+            catch(Exception ex)
+            {
+                return MappedScanResult<FuelPriceResult>.Fail(ex.Message);
+            }
         }
     }
 
@@ -22,7 +35,10 @@ namespace FuelStationAPI
         {
             string t = text.ToString();
 
-            if (t.Contains("95")) 
+            if (t.Contains("95") && t.Contains("E5"))
+                return new(FuelType.Euro95_E5);
+
+            if (t.Contains("95"))
                 return new(FuelType.Euro95_E10);
 
             if (t.Contains("98")) 
@@ -30,6 +46,9 @@ namespace FuelStationAPI
 
             if (t.Contains("Diesel"))
                 return new(FuelType.Diesel);
+
+            if (t.Contains("AdBlue"))
+                return new(FuelType.AdBlue);
 
             if (t.Contains("CNG"))
                 return new(FuelType.CNG);

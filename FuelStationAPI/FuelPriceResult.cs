@@ -2,7 +2,6 @@
 {
     public class FuelPriceResult
     {
-
         public FuelPriceResult(FuelType fuelType, double price)
         {
             FuelType = fuelType;
@@ -28,7 +27,6 @@
 
     public static class FuelTypeExtensions
     {
-
         public static Predicate<FuelType> Gasoline = (FuelType t) => t switch
         {
             FuelType.Euro95_E5 => true,

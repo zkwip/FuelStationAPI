@@ -3,9 +3,9 @@ using TextScanner;
 
 namespace FuelStationAPI.DataSources
 {
-    public class StationDetailSource : IFuelPriceDataSource
+    public class FuelPriceDataSource : IFuelPriceDataSource
     {
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly IMemoryCache _memoryCache;
 
         private readonly string _providerName;
@@ -14,9 +14,9 @@ namespace FuelStationAPI.DataSources
 
         public string DataProvider => _providerName;
 
-        public StationDetailSource(HttpClient httpClient, IMemoryCache memoryCache, ITextSpanMapper<List<FuelPriceResult>> mapper, Func<FuelStationIdentifier, string> urlBuilder, string providerName)
+        public FuelPriceDataSource(IHttpClientFactory httpClient, IMemoryCache memoryCache, ITextSpanMapper<List<FuelPriceResult>> mapper, Func<FuelStationIdentifier, string> urlBuilder, string providerName)
         {
-            _httpClient = httpClient;
+            _httpClientFactory = httpClient;
             _memoryCache = memoryCache;
             _mapper = mapper;
             _urlBuilder = urlBuilder;
@@ -43,7 +43,9 @@ namespace FuelStationAPI.DataSources
         }
         
         private async Task<string?> GetHttpBodyAsync(string url){
-            using var message = await _httpClient.GetAsync(url);
+
+            using var httpClient = _httpClientFactory.CreateClient(_providerName);
+            using var message = await httpClient.GetAsync(url);
 
             if (!message.IsSuccessStatusCode)
                 return null;

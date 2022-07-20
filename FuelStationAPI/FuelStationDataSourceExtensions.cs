@@ -8,84 +8,107 @@ namespace FuelStationAPI
     {
         public static void AddFuelStationDataSources(this IServiceCollection services)
         {
-            AddTinqServices(services);
-            AddArgosServices(services);
+            //AddTinqServices(services);
+            //AddArgosServices(services);
+            AddCarbuServices(services);
         }
 
         private static void AddArgosServices(IServiceCollection services)
         {
-            services.AddSingleton(p =>
-            {
-                return StationListSourceFactory(p, "https://www.argos.nl/tankstations", "argos", new PatternMapper<FuelStationIdentifier>(
-                    ScanPattern.Create()
-                        .AddHandle("<div class=\"marker\" data-id=\"")
-                        .AddEnclosedGetter("lat", "data-lat=\"", "\"")
-                        .AddEnclosedGetter("lng", "data-lng=\"", "\"")
-                        .AddEnclosedGetter("name", "<strong>", "</strong>")
-                        .AddEnclosedGetter("identifier", "<a href=\"https://www.argos.nl/tankstation/", "\">Bekijk</a>"),
-                    new FuelStationIdentifierMapper("argos", "Argos ")
-                ).Repeat);
-            });
+            AddDataSourceServices(
+                services,
+                "argos",
+                "",
+                "https://www.argos.nl/tankstations",
+                s => $"https://www.argos.nl/tankstation/{s.Identifier}",
+                ScanPattern.Create()
+                    .AddHandle("<div class=\"marker\" data-id=\"")
+                    .AddEnclosedGetter("lat", "data-lat=\"", "\"")
+                    .AddEnclosedGetter("lng", "data-lng=\"", "\"")
+                    .AddEnclosedGetter("name", "<strong>", "</strong>")
+                    .AddEnclosedGetter("identifier", "<a href=\"https://www.argos.nl/tankstation/", "\">Bekijk</a>"),
+                ScanPattern.Create()
+                    .AddHandle("<div class=\"col col4 price-item\">")
+                    .AddEnclosedGetter("type", "<label class=\"name\">", "</label>")
+                    .AddEnclosedGetter("price", "<span class=\"price\"> ", "</sup> </span>"),
+                false);
+        }
 
-            services.AddSingleton(p =>
-            {
-                return StationDataSourceFactory(p, s => $"https://www.argos.nl/tankstation/{s.Identifier}", "argos", new PatternMapper<FuelPriceResult>(
-                    ScanPattern.Create()
-                        .AddHandle("<div class=\"col col4 price-item\">")
-                        .AddEnclosedGetter("type", "<label class=\"name\">", "</label>")
-                        .AddEnclosedGetter("price", "<span class=\"price\"> ", "</sup> </span>"),
-                    new FuelPriceResultMapper()
-                ).Repeat);
-            });
+        private static void AddCarbuServices(IServiceCollection services)
+        {
+            AddDataSourceServices(
+                services,
+                "carbu",
+                "",
+                "https://carbu.com/belgie//liste-stations-service/E10/Bilzen/3740/BE_li_701",
+                s => $"https://carbu.com/belgie/index.php/station/{s.Identifier}",
+                ScanPattern.Create()
+                    .AddHandle("<div class=\"station-content col-xs-12\">")
+                    .AddEnclosedGetter("lat", "data-lat=\"", "\"")
+                    .AddEnclosedGetter("lng", "data-lng=\"", "\"")
+                    .AddEnclosedGetter("name", "data-name=\"", "\"")
+                    .AddEnclosedGetter("identifier", "data-link=\"https://carbu.com/belgie/index.php/station/", "\""),
+                ScanPattern.Create()
+                    .AddHandle("<div class=\"col-xs-12 col-sm-6\">")
+                    .AddHandle("<div class=\"panel-heading\" style=\"text-align:center\">")
+                    .AddEnclosedGetter("type", "<h2 class=\"title\">", "</h2>")
+                    .AddEnclosedGetter("price", "<h1 class=\"price\">", " &euro;"),
+                true);
         }
 
         private static void AddTinqServices(IServiceCollection services)
         {
-            services.AddSingleton(p =>
+            AddDataSourceServices(
+                services,
+                "tinq",
+                "TINQ ",
+                "https://www.tinq.nl/tankstations",
+                s => $"https://www.tinq.nl/tankstations/{s.Identifier}",
+                ScanPattern.Create()
+                    .AddEnclosedGetter("lat", "data-lat=\"", "\"")
+                    .AddEnclosedGetter("lng", "data-lng=\"", "\"")
+                    .AddEnclosedGetter("name", "<span class=\"field-content\"><h2>", "</h2>")
+                    .AddEnclosedGetter("identifier", "<span class=\"field-content\"><a href=\"/tankstations/", "#default"),
+                ScanPattern.Create()
+                    .AddEnclosedGetter("type", "<div class=\"node node--type-price node--view-mode-default taxonomy-term-", " ds-1col clearfix\">")
+                    .AddEnclosedGetter("price", "<div content=\"", "\" class=\"field field--name-field-prices-price-pump field--type-float field--label-hidden field__item\">"),
+                false);
+        }
+
+        private static void AddDataSourceServices(IServiceCollection services, string providerName, string namePrefix, string listUrl, Func<FuelStationIdentifier, string> priceUrlBuilder, ScanPattern listPattern, ScanPattern pricePattern, bool useDecimalCommaPrice)
+        {
+            services.AddHttpClient(providerName, client =>
             {
-                return StationListSourceFactory(p, "https://www.tinq.nl/tankstations", "tinq", new PatternMapper<FuelStationIdentifier>(
-                    ScanPattern.Create()
-                        .AddEnclosedGetter("lat", "data-lat=\"", "\"")
-                        .AddEnclosedGetter("lng", "data-lng=\"", "\"")
-                        .AddEnclosedGetter("name", "<span class=\"field-content\"><h2>", "</h2>")
-                        .AddEnclosedGetter("identifier", "<span class=\"field-content\"><a href=\"/tankstations/", "#default"),
-                    new FuelStationIdentifierMapper("tinq", "TINQ ")
-                ).Repeat);
+                client.DefaultRequestHeaders.Add("Accept", "text/html");
+                client.DefaultRequestHeaders.Add("User-Agent", "GibGas");
             });
 
-            services.AddSingleton(p =>
+            services.AddSingleton<IFuelStationListSource>(p =>
             {
-                return StationDataSourceFactory(p, s => $"https://www.tinq.nl/tankstations/{s.Identifier}", "tinq", new PatternMapper<FuelPriceResult>(
-                    ScanPattern.Create()
-                        .AddEnclosedGetter("type", "<div class=\"node node--type-price node--view-mode-default taxonomy-term-", " ds-1col clearfix\">")
-                        .AddEnclosedGetter("price", "<div content=\"", "\" class=\"field field--name-field-prices-price-pump field--type-float field--label-hidden field__item\">"),
-                    new FuelPriceResultMapper()
-                ).Repeat);
+                return new FuelStationListSource(
+                    p.GetRequiredService<IHttpClientFactory>(),
+                    p.GetRequiredService<IMemoryCache>(),
+                    new PatternMapper<FuelStationIdentifier>(
+                        listPattern,
+                        new FuelStationIdentifierMapper(providerName, namePrefix)
+                        ).Repeat,
+                    listUrl,
+                    providerName
+                );
+            });
+
+            services.AddSingleton<IFuelPriceDataSource>(p =>
+            {
+                return new FuelPriceDataSource(
+                    p.GetRequiredService<IHttpClientFactory>(),
+                    p.GetRequiredService<IMemoryCache>(),
+                    new PatternMapper<FuelPriceResult>(
+                        pricePattern,
+                        new FuelPriceResultMapper(useDecimalCommaPrice)
+                    ).Repeat,
+                    priceUrlBuilder,
+                    providerName);
             });
         }
-
-        public static IFuelPriceDataSource StationDataSourceFactory(IServiceProvider services, Func<FuelStationIdentifier, string> urlBuilder, string providerName, ITextSpanMapper<List<FuelPriceResult>> mapper)
-        {
-            return new StationDetailSource(
-                services.GetRequiredService<HttpClient>(),
-                services.GetRequiredService<IMemoryCache>(),
-                mapper,
-                urlBuilder,
-                providerName
-            );
-        }
-
-        public static IFuelStationListSource StationListSourceFactory(IServiceProvider services, string url, string providerName, ITextSpanMapper<List<FuelStationIdentifier>> mapper)
-        {
-            return new StationListSource(
-                services.GetRequiredService<HttpClient>(),
-                services.GetRequiredService<IMemoryCache>(),
-                mapper,
-                url,
-                providerName
-            );
-        }
-
-
     }
 }
