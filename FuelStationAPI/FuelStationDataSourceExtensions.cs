@@ -10,7 +10,31 @@ namespace FuelStationAPI
         {
             //AddTinqServices(services);
             //AddArgosServices(services);
-            AddCarbuServices(services);
+            //AddCarbuServices(services);
+            AddTangoServices(services);
+
+        }
+
+        private static void AddTangoServices(IServiceCollection services)
+        {
+            AddDataSourceServices(
+                services,
+                "tango",
+                "",
+                "https://www.tango.nl/get/stations.json",
+                s => $"https://www.tango.nl/stations/{s.Identifier}",
+                ScanPattern.Create()
+                    .AddHandle("StationId")
+                    .AddEnclosedGetter("identifier", "NodeURL\":\"\\/stations\\/", "\",")
+                    .AddEnclosedGetter("name", "Name\":\"", "\",")
+                    .AddEnclosedGetter("lat", "XCoordinate\":\"", "\",")
+                    .AddEnclosedGetter("lng", "YCoordinate\":\"", "\","),
+                ScanPattern.Create()
+                    .AddHandle("<div class=\"pricing ")
+                    .AddEnclosedGetter("type", "\" id=\"", "\">")
+                    .AddHandle("<div class=\"pump_price\">")
+                    .AddEnclosedGetter("price", "<span class=\"price\">","</span> EUR"),
+                false);
         }
 
         private static void AddArgosServices(IServiceCollection services)
@@ -79,7 +103,6 @@ namespace FuelStationAPI
         {
             services.AddHttpClient(providerName, client =>
             {
-                client.DefaultRequestHeaders.Add("Accept", "text/html");
                 client.DefaultRequestHeaders.Add("User-Agent", "GibGas");
             });
 
