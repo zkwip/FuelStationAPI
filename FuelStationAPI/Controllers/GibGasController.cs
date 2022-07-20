@@ -48,7 +48,6 @@ namespace FuelStationAPI.Controllers
         }
 
         [HttpGet("GetPrices")]
-
         public async Task<List<FuelPriceResult>> GetPricesAsync(FuelStationIdentifier station) => await GetPricesAsync(station, null);
         private async Task<List<FuelPriceResult>> GetPricesAsync(FuelStationIdentifier station, Predicate<FuelType>? fuels)
         { 
@@ -89,6 +88,9 @@ namespace FuelStationAPI.Controllers
 
         [HttpGet("GetAllPrices")]
         public async Task<List<FuelStationPricesPair>> GetAllPricesAsync() => await GetAllPricesAsync(null, null);
+
+        [HttpGet("GetClosePrices")]
+        public async Task<List<FuelStationPricesPair>> GetClosePricesAsync() => await GetAllPricesAsync(x => Geolocation.Distance(x.Location,_location) < 20.0, null);
 
 
         private async Task<List<FuelStationPricesPair>> GetAllPricesAsync(Predicate<FuelStationIdentifier>? which = null, Predicate<FuelType>? fuels = null)

@@ -17,5 +17,8 @@
             DataPrivider = provider;
             Name = name;
         }
+
+        public override string ToString() => $"{DataPrivider}:{Identifier}";
+        
     }
 }

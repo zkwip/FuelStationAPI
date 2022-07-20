@@ -8,7 +8,39 @@ namespace FuelStationAPI
     {
         public static void AddFuelStationDataSources(this IServiceCollection services)
         {
-            // TINQ
+            AddTinqServices(services);
+            AddArgosServices(services);
+        }
+
+        private static void AddArgosServices(IServiceCollection services)
+        {
+            services.AddSingleton(p =>
+            {
+                return StationListSourceFactory(p, "https://www.argos.nl/tankstations", "argos", new PatternMapper<FuelStationIdentifier>(
+                    ScanPattern.Create()
+                        .AddHandle("<div class=\"marker\" data-id=\"")
+                        .AddEnclosedGetter("lat", "data-lat=\"", "\"")
+                        .AddEnclosedGetter("lng", "data-lng=\"", "\"")
+                        .AddEnclosedGetter("name", "<strong>", "</strong>")
+                        .AddEnclosedGetter("identifier", "<a href=\"https://www.argos.nl/tankstation/", "\">Bekijk</a>"),
+                    new FuelStationIdentifierMapper("argos", "Argos ")
+                ).Repeat);
+            });
+
+            services.AddSingleton(p =>
+            {
+                return StationDataSourceFactory(p, s => $"https://www.argos.nl/tankstation/{s.Identifier}", "argos", new PatternMapper<FuelPriceResult>(
+                    ScanPattern.Create()
+                        .AddHandle("<div class=\"col col4 price-item\">")
+                        .AddEnclosedGetter("type", "<label class=\"name\">", "</label>")
+                        .AddEnclosedGetter("price", "<span class=\"price\"> ", "</sup> </span>"),
+                    new FuelPriceResultMapper()
+                ).Repeat);
+            });
+        }
+
+        private static void AddTinqServices(IServiceCollection services)
+        {
             services.AddSingleton(p =>
             {
                 return StationListSourceFactory(p, "https://www.tinq.nl/tankstations", "tinq", new PatternMapper<FuelStationIdentifier>(
@@ -17,7 +49,7 @@ namespace FuelStationAPI
                         .AddEnclosedGetter("lng", "data-lng=\"", "\"")
                         .AddEnclosedGetter("name", "<span class=\"field-content\"><h2>", "</h2>")
                         .AddEnclosedGetter("identifier", "<span class=\"field-content\"><a href=\"/tankstations/", "#default"),
-                    new FuelStationIdentifierMapper("tinq","TINQ ")
+                    new FuelStationIdentifierMapper("tinq", "TINQ ")
                 ).Repeat);
             });
 
