@@ -1,13 +1,21 @@
 # FuelStationAPI
-API for scraping and processing fuel prices
+API for scraping, aggregating and processing fuel prices from multiple sources
 
 # Features
  - Checking price
  - Checking & filtering on distance
+ - Price caching
+
+# Planned features
+ - Travel cost vs money saved calculations
+ - Route suggestions
+ - More countries
 
 # Supported sources
- - TINQ
- - Tango
- - CARBU
- - CleverTanken.de
- - Argos
+ - https://argos.nl/
+ - https://carbu.be/
+ - https://tango.nl/
+ - https://tinq.nl/
+
+# Planned sources
+ - https://tankbillig.info/ or other german all-round sources

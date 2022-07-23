@@ -1,18 +1,9 @@
-using FuelStationAPI.DataProviders;
+using FuelStationAPI.DataSources;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-builder.Services.AddScoped<IFuelStationDataProvider, TinqStationDataProvider>();
-builder.Services.AddScoped<IFuelStationDataProvider, TangoStationDataProvider>();
-builder.Services.AddScoped<IFuelStationDataProvider, CarbuStationDataProvider>();
-builder.Services.AddScoped<IFuelStationDataProvider, ArgosStationDataProvider>();
-builder.Services.AddScoped<IFuelStationDataProvider, CleverTankenStationDataProvider>();
-
-
-builder.Services.AddControllers();
-builder.Services.AddHttpClient();
 builder.Services.AddMemoryCache();
+builder.Services.AddControllers();
+builder.Services.AddFuelStationDataSources();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
