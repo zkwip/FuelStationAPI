@@ -8,33 +8,11 @@ namespace FuelStationAPI
     {
         public static void AddFuelStationDataSources(this IServiceCollection services)
         {
-            //AddTinqServices(services);
-            //AddArgosServices(services);
-            //AddCarbuServices(services);
+            AddArgosServices(services);
+            AddCarbuServices(services);
             AddTangoServices(services);
-
-        }
-
-        private static void AddTangoServices(IServiceCollection services)
-        {
-            AddDataSourceServices(
-                services,
-                "tango",
-                "",
-                "https://www.tango.nl/get/stations.json",
-                s => $"https://www.tango.nl/stations/{s.Identifier}",
-                ScanPattern.Create()
-                    .AddHandle("StationId")
-                    .AddEnclosedGetter("identifier", "NodeURL\":\"\\/stations\\/", "\",")
-                    .AddEnclosedGetter("name", "Name\":\"", "\",")
-                    .AddEnclosedGetter("lat", "XCoordinate\":\"", "\",")
-                    .AddEnclosedGetter("lng", "YCoordinate\":\"", "\","),
-                ScanPattern.Create()
-                    .AddHandle("<div class=\"pricing ")
-                    .AddEnclosedGetter("type", "\" id=\"", "\">")
-                    .AddHandle("<div class=\"pump_price\">")
-                    .AddEnclosedGetter("price", "<span class=\"price\">","</span> EUR"),
-                false);
+            //AddTankBilligServices(services);
+            AddTinqServices(services);
         }
 
         private static void AddArgosServices(IServiceCollection services)
@@ -78,6 +56,50 @@ namespace FuelStationAPI
                     .AddEnclosedGetter("type", "<h2 class=\"title\">", "</h2>")
                     .AddEnclosedGetter("price", "<h1 class=\"price\">", " &euro;"),
                 true);
+        }
+
+        private static void AddTangoServices(IServiceCollection services)
+        {
+            AddDataSourceServices(
+                services,
+                "tango",
+                "",
+                "https://www.tango.nl/get/stations.json",
+                s => $"https://www.tango.nl/stations/{s.Identifier}",
+                ScanPattern.Create()
+                    .AddHandle("StationId")
+                    .AddEnclosedGetter("identifier", "NodeURL\":\"\\/stations\\/", "\",")
+                    .AddEnclosedGetter("name", "Name\":\"", "\",")
+                    .AddEnclosedGetter("lat", "XCoordinate\":\"", "\",")
+                    .AddEnclosedGetter("lng", "YCoordinate\":\"", "\","),
+                ScanPattern.Create()
+                    .AddHandle("<div class=\"pricing ")
+                    .AddEnclosedGetter("type", "\" id=\"", "\">")
+                    .AddHandle("<div class=\"pump_price\">")
+                    .AddEnclosedGetter("price", "<span class=\"price\">", "</span> EUR"),
+                false);
+        }
+
+        private static void AddTankBilligServices(IServiceCollection services)
+        {
+            // pricing does not yet work with this version of TextScanner, waiting for TextMagic instead.
+            AddDataSourceServices(
+                services,
+                "tankbillig",
+                "",
+                "https://tankbillig.info/index.php?lat=51.7833&long=6.0167",
+                s => $"https://ich-tanke.de/tankstelle/{s.Identifier}",
+                ScanPattern.Create()
+                    .AddEnclosedGetter("identifier", "\"stationID\":\"", "\",")
+                    .AddEnclosedGetter("name", "\"gasStationName\":\"", "\", \"brand\":\"")
+                    .AddEnclosedGetter("lng", "\", \"longitude\":\"", "\",")
+                    .AddEnclosedGetter("lat", "\", \"latitude\":\"", "\","),
+                ScanPattern.Create()
+                    .AddHandle("<div class=\"pricing ")
+                    .AddEnclosedGetter("type", "\" id=\"", "\">")
+                    .AddHandle("<div class=\"pump_price\">")
+                    .AddEnclosedGetter("price", "<span class=\"price\">", "</span> EUR"),
+                false);
         }
 
         private static void AddTinqServices(IServiceCollection services)
