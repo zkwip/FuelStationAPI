@@ -1,7 +1,4 @@
-﻿using FuelStationAPI.DataProviders;
-using TextScanner;
-
-namespace FuelStationAPI.DataSources
+﻿namespace FuelStationAPI.DataSources
 {
     
 }

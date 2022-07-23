@@ -8,13 +8,13 @@ namespace FuelStationAPI.Controllers
     [Route("[controller]")]
     public class GibGasController : ControllerBase
     {
-        private readonly ILogger<FuelStationController> _logger;
+        private readonly ILogger<GibGasController> _logger;
         private readonly IEnumerable<IFuelPriceDataSource> _fuelPriceDataSources;
         private readonly IEnumerable<IFuelStationDetailSource> _stationDetailSources;
         private readonly IEnumerable<IFuelStationListSource> _stationListSources;
         private Geolocation _location;
 
-        public GibGasController(ILogger<FuelStationController> logger, IEnumerable<IFuelPriceDataSource> fuelPriceDataSources, IEnumerable<IFuelStationDetailSource> stationDetailSources, IEnumerable<IFuelStationListSource> stationListSources)
+        public GibGasController(ILogger<GibGasController> logger, IEnumerable<IFuelPriceDataSource> fuelPriceDataSources, IEnumerable<IFuelStationDetailSource> stationDetailSources, IEnumerable<IFuelStationListSource> stationListSources)
         {
             _logger = logger;
             _location = Geolocation.Maastricht;
