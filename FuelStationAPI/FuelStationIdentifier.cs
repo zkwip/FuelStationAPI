@@ -19,6 +19,6 @@
         }
 
         public override string ToString() => $"{DataPrivider}:{Identifier}";
-        
+
     }
 }

@@ -1,5 +1,5 @@
-﻿using Xunit;
-using TextScanner;
+﻿using TextScanner;
+using Xunit;
 
 namespace TextScannerTests
 {
@@ -16,7 +16,7 @@ namespace TextScannerTests
         [Fact]
         public void ToStringOfNewScraperShouldMatchWholeString()
         {
-            Assert.Equal(_text,_sut.GetRemainingText().ToString());
+            Assert.Equal(_text, _sut.GetRemainingText().ToString());
         }
 
         [Fact]
@@ -47,7 +47,7 @@ namespace TextScannerTests
             Assert.False(_sut.Contains("woldr"));
 
             _sut.ReadTo("world");
-            
+
             Assert.False(_sut.Contains("world"));
             Assert.True(_sut.Contains("this"));
         }

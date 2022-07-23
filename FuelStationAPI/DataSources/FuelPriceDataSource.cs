@@ -25,7 +25,8 @@ namespace FuelStationAPI.DataSources
 
         public async Task<MappedScanResult<List<FuelPriceResult>>> GetPricesAsync(FuelStationIdentifier station)
         {
-            return await _memoryCache.GetOrCreateAsync(station, async entry => {
+            return await _memoryCache.GetOrCreateAsync(station, async entry =>
+            {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(2);
                 return await QueryStationPricesAsync(station);
             });
@@ -41,8 +42,9 @@ namespace FuelStationAPI.DataSources
             return _mapper.Map(new(body));
 
         }
-        
-        private async Task<string?> GetHttpBodyAsync(string url){
+
+        private async Task<string?> GetHttpBodyAsync(string url)
+        {
 
             using var httpClient = _httpClientFactory.CreateClient(_providerName);
             using var message = await httpClient.GetAsync(url);

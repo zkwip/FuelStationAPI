@@ -1,4 +1,4 @@
-using FuelStationAPI;
+using FuelStationAPI.DataSources;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMemoryCache();

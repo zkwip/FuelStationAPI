@@ -25,7 +25,8 @@ namespace FuelStationAPI.DataSources
 
         public async Task<MappedScanResult<List<FuelStationIdentifier>>> GetStationListAsync()
         {
-            return await _memoryCache.GetOrCreateAsync(_providerName, async entry => {
+            return await _memoryCache.GetOrCreateAsync(_providerName, async entry =>
+            {
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(2);
                 return await QueryStationListAsync();
             });

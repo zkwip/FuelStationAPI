@@ -19,7 +19,7 @@
             Message = msg;
         }
 
-        public static MappedScanResult<T> Fail(string msg) => new MappedScanResult<T>(false, msg);
+        public static MappedScanResult<T> Fail(string msg) => new(false, msg);
 
         public T Result => _resultData!;
     }

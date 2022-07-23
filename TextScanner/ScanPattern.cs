@@ -5,7 +5,7 @@
         private readonly List<string> _handles;
         private readonly Dictionary<int, string> _names;
 
-        private bool BreakOnMissedHandle;
+        private readonly bool BreakOnMissedHandle;
 
         private ScanPattern(bool breakOnStepFail = true)
         {
@@ -47,7 +47,7 @@
             {
                 bool stepSuccess = StepOverHandles(scraper, result, i);
 
-                if (!stepSuccess && BreakOnMissedHandle) 
+                if (!stepSuccess && BreakOnMissedHandle)
                     return new("Could not find handle " + _handles[i]);
             }
 
@@ -58,7 +58,7 @@
         {
             string handle = _handles[index];
 
-            if (!scraper.Contains(handle)) 
+            if (!scraper.Contains(handle))
                 return false;
 
             if (_names.ContainsKey(index))

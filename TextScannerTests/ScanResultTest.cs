@@ -8,12 +8,14 @@ namespace TextScannerTests
     public class ScanResultTest
     {
         private const string _message = "hallo";
-        Dictionary<string, ManagedTextSpan> _data;
+        private readonly Dictionary<string, ManagedTextSpan> _data;
 
         public ScanResultTest()
         {
-            _data = new Dictionary<string, ManagedTextSpan>();
-            _data.Add(_message, new ManagedTextSpan(_message));
+            _data = new Dictionary<string, ManagedTextSpan>
+            {
+                { _message, new ManagedTextSpan(_message) }
+            };
         }
 
         [Fact]
@@ -29,7 +31,7 @@ namespace TextScannerTests
         {
             var res = new ScanResult(_message);
 
-            Assert.Equal(_message,res.Message);
+            Assert.Equal(_message, res.Message);
         }
 
         [Fact]

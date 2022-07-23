@@ -15,7 +15,7 @@ namespace FuelStationAPI
 
         public MappedScanResult<FuelStationIdentifier> Map(ScanResult result)
         {
-            if (!result.Succes) 
+            if (!result.Succes)
                 return MappedScanResult<FuelStationIdentifier>.Fail(result.Message);
 
             try

@@ -4,7 +4,7 @@ namespace FuelStationAPI
 {
     internal class FuelPriceResultMapper : IScanResultMapper<FuelPriceResult>
     {
-        private bool _useDecimalCommaInPrice;
+        private readonly bool _useDecimalCommaInPrice;
 
         public FuelPriceResultMapper(bool useDecimalCommaPrice)
         {
@@ -22,7 +22,7 @@ namespace FuelStationAPI
 
                 return new MappedScanResult<FuelPriceResult>(new FuelPriceResult(type, price));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return MappedScanResult<FuelPriceResult>.Fail(ex.Message);
             }
@@ -41,7 +41,7 @@ namespace FuelStationAPI
             if (t.Contains("95"))
                 return new(FuelType.Euro95_E10);
 
-            if (t.Contains("98")) 
+            if (t.Contains("98"))
                 return new(FuelType.Euro98_E5);
 
             if (t.Contains("Diesel"))

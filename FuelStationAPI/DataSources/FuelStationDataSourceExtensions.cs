@@ -1,8 +1,7 @@
-﻿using FuelStationAPI.DataSources;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using TextScanner;
 
-namespace FuelStationAPI
+namespace FuelStationAPI.DataSources
 {
     public static class FuelStationDataSourceExtensions
     {

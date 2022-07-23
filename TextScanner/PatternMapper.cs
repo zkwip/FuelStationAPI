@@ -22,12 +22,12 @@
 
         public List<TOut> RepeatToList(ManagedTextSpan text, int limit = -1)
         {
-            List<TOut> result = new List<TOut>();
+            List<TOut> result = new();
             var scraper = new Scanner(text);
 
             while (true)
             {
-                if (limit > 0 && result.Count > limit) 
+                if (limit > 0 && result.Count > limit)
                     break;
 
                 var itemResult = _pattern.RunOn(scraper);
@@ -44,7 +44,7 @@
 
     public class MultiPatternMapper<TOut> : ITextSpanMapper<List<TOut>>
     {
-        private PatternMapper<TOut> _itemMapper;
+        private readonly PatternMapper<TOut> _itemMapper;
 
         public MultiPatternMapper(PatternMapper<TOut> itemMapper)
         {

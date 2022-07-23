@@ -1,6 +1,5 @@
 ﻿using FuelStationAPI.DataSources;
 using Microsoft.AspNetCore.Mvc;
-using TextScanner;
 
 namespace FuelStationAPI.Controllers
 {
@@ -49,7 +48,7 @@ namespace FuelStationAPI.Controllers
                 }
 
                 _logger.LogWarning("Empty result detected");
-                   
+
             }
 
             return list;
@@ -58,7 +57,7 @@ namespace FuelStationAPI.Controllers
         [HttpGet("GetPrices")]
         public async Task<List<FuelPriceResult>> GetPricesAsync(FuelStationIdentifier station) => await GetPricesAsync(station, null);
         private async Task<List<FuelPriceResult>> GetPricesAsync(FuelStationIdentifier station, Predicate<FuelType>? fuels)
-        { 
+        {
             IFuelPriceDataSource? priceSource = GetPriceSource(station);
             if (priceSource is null)
                 throw new Exception();
@@ -67,14 +66,14 @@ namespace FuelStationAPI.Controllers
                 fuels = FuelTypeExtensions.Gasoline;
 
             var prices = await priceSource.GetPricesAsync(station);
-            
+
             if (!prices.Succes)
-                _logger.LogWarning(prices.Message);
+                _logger.LogWarning("GetPrices failed: {}", prices.Message);
 
             List<FuelPriceResult> list = prices.Result;
 
-            if(list.Count == 0)
-                _logger.LogWarning("no prices found for station {0}", station);
+            if (list.Count == 0)
+                _logger.LogWarning("no prices found for station {}", station);
 
             return list.FindAll(item => fuels.Invoke(item.FuelType));
         }
@@ -110,15 +109,15 @@ namespace FuelStationAPI.Controllers
 
         private IFuelPriceDataSource? GetPriceSource(FuelStationIdentifier station)
         {
-            foreach(IFuelPriceDataSource source in _fuelPriceDataSources)
+            foreach (IFuelPriceDataSource source in _fuelPriceDataSources)
             {
-                if (station.DataPrivider == source.DataProvider) 
+                if (station.DataPrivider == source.DataProvider)
                     return source;
             }
 
-            _logger.LogWarning("Could not find a suitable PriceDataSource for the provider handle {0}", station.DataPrivider);
+            _logger.LogWarning("Could not find a suitable PriceDataSource for the provider handle {}", station.DataPrivider);
 
-            return null; 
+            return null;
         }
     }
 }
