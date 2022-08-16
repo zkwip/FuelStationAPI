@@ -25,8 +25,8 @@ namespace FuelStationAPI.Controllers
 
         private readonly Predicate<FuelStationIdentifier> AllStations = s => true;
 
-        [HttpGet("Test")]
-        public string Test() => "Hello";
+        [HttpGet("Version")]
+        public string Version() => "v0.0.2";
 
         [HttpGet("GetStations")]
         public async Task<List<FuelStationIdentifier>> GetStationsAsync() => await GetStationsAsync(null);
