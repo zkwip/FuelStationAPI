@@ -1,20 +1,21 @@
-﻿using FuelStationAPI.Domain;
+﻿using FuelStationAPI.Aggregator;
+using FuelStationAPI.Domain;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FuelStationAPI.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class GibGasController : ControllerBase
+    public class FuelPricesController : ControllerBase
     {
-        private readonly FuelServiceAggregator _fuelServiceAggregator;
+        private readonly FuelPricesAggregator _fuelServiceAggregator;
 
         private readonly Geolocation _location;
         private readonly double _searchDistance = 15.0;
         private readonly double _litersPerKm = 0.07;
         private readonly double _tankSize = 45.0;
 
-        public GibGasController(FuelServiceAggregator fuelServiceAggregator)
+        public FuelPricesController(FuelPricesAggregator fuelServiceAggregator)
         {
             _location = Geolocation.Maastricht;
             _fuelServiceAggregator = fuelServiceAggregator;
@@ -53,7 +54,7 @@ namespace FuelStationAPI.Controllers
             _fuelServiceAggregator.GetAllStationsAsync()
                 .Where(station => station.IsCloseTo(_searchDistance, _location))
                 .AggregatePrices(_fuelServiceAggregator)
-                .OnlyFuel(FuelType.Euro95_E10)
+                .OnlyFuel(FuelTypeExtensions.Gasoline)
                 .ToCostAnalysis(data => data.Prices.Min(price => price.Price) * _tankSize)
                 .AddCost(data => 2 * Geolocation.Distance(_location, data.Station.Location) * _litersPerKm * data.Prices.Min(price => price.Price));
     }

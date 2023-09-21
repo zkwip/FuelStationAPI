@@ -1,4 +1,5 @@
 ﻿using TextScanner;
+using TextScanner.Pattern;
 using Xunit;
 
 namespace TextScannerTests

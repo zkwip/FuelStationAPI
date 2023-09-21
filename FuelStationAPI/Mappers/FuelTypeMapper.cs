@@ -1,5 +1,6 @@
 ﻿using FuelStationAPI.Domain;
 using TextScanner;
+using TextScanner.SpanMapper;
 
 namespace FuelStationAPI.Mappers
 {

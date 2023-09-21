@@ -1,6 +1,6 @@
 ﻿using FuelStationAPI.Domain;
 using Microsoft.Extensions.Caching.Memory;
-using TextScanner;
+using TextScanner.SpanMapper;
 
 namespace FuelStationAPI.DataSources
 {

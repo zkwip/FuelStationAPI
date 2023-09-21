@@ -1,4 +1,4 @@
-﻿namespace TextScanner
+﻿namespace TextScanner.Pattern
 {
     public class ScanPattern : IExtendableScanPattern
     {
@@ -70,16 +70,5 @@
             scraper.SkipTo(handle);
             return true;
         }
-    }
-
-    public interface IOpenScanPattern
-    {
-        ScanPattern AddHandle(string handle);
-        ScanPattern AddEnclosedGetter(string name, string prefix, string suffix);
-    }
-
-    public interface IExtendableScanPattern : IOpenScanPattern
-    {
-        IOpenScanPattern AddGetter(string name);
     }
 }

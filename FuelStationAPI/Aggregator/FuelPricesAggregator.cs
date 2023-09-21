@@ -1,15 +1,15 @@
 ﻿using FuelStationAPI.DataSources;
 using FuelStationAPI.Domain;
 
-namespace FuelStationAPI
+namespace FuelStationAPI.Aggregator
 {
-    public class FuelServiceAggregator
+    public class FuelPricesAggregator
     {
-        private readonly ILogger<FuelServiceAggregator> _logger;
+        private readonly ILogger<FuelPricesAggregator> _logger;
         private readonly IEnumerable<IFuelPriceDataSource> _fuelPriceDataSources;
         private readonly IEnumerable<IFuelStationListSource> _stationListSources;
 
-        public FuelServiceAggregator(ILogger<FuelServiceAggregator> logger, IEnumerable<IFuelPriceDataSource> fuelPriceDataSources, IEnumerable<IFuelStationListSource> stationListSources)
+        public FuelPricesAggregator(ILogger<FuelPricesAggregator> logger, IEnumerable<IFuelPriceDataSource> fuelPriceDataSources, IEnumerable<IFuelStationListSource> stationListSources)
         {
             _logger = logger;
 

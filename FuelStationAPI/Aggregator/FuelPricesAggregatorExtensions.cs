@@ -1,25 +1,28 @@
 ﻿using FuelStationAPI.Domain;
 
-namespace FuelStationAPI
+namespace FuelStationAPI.Aggregator
 {
-    static class FuelServiceAggeregatorExtensions
+    static class FuelPricesAggregatorExtensions
     {
-        public static IAsyncEnumerable<FuelStationPriceData> NonEmpty(this IAsyncEnumerable<FuelStationPriceData> source) => 
+        public static IAsyncEnumerable<FuelStationPriceData> NonEmpty(this IAsyncEnumerable<FuelStationPriceData> source) =>
             source.Where(x => x.Prices.Any(price => price.Price > 0.0));
 
         public static IAsyncEnumerable<FuelStationPriceData> OnlyFuel(this IAsyncEnumerable<FuelStationPriceData> source, FuelType type) =>
-            source.Select(oldData => FilterPrice(oldData, type)).NonEmpty();
+            source.Select(oldData => FilterPrice(oldData, x => x == type)).NonEmpty();
 
-        private static FuelStationPriceData FilterPrice(FuelStationPriceData oldData, FuelType type)
+        public static IAsyncEnumerable<FuelStationPriceData> OnlyFuel(this IAsyncEnumerable<FuelStationPriceData> source, Predicate<FuelType> fuelSpec) =>
+            source.Select(oldData => FilterPrice(oldData, fuelSpec)).NonEmpty();
+
+        private static FuelStationPriceData FilterPrice(FuelStationPriceData oldData, Predicate<FuelType> fuelSpec)
         {
             if (!oldData.Prices.Any())
                 return oldData;
 
-            var newPrice = oldData.Prices.Where<FuelPriceResult>((FuelPriceResult price) => price.FuelType == type);
+            var newPrice = oldData.Prices.Where(x => fuelSpec(x.FuelType));
             return new FuelStationPriceData(oldData.Station, newPrice);
         }
 
-        public static IAsyncEnumerable<FuelStationPriceData> AggregatePrices(this IAsyncEnumerable<FuelStationIdentifier> stations, FuelServiceAggregator aggregator) =>
+        public static IAsyncEnumerable<FuelStationPriceData> AggregatePrices(this IAsyncEnumerable<FuelStationIdentifier> stations, FuelPricesAggregator aggregator) =>
             aggregator.GetMultiStationPriceDataAsync(stations).NonEmpty();
 
         public static IAsyncEnumerable<CostAnalysis<FuelStationPriceData>> ToCostAnalysis(this IAsyncEnumerable<FuelStationPriceData> data, Func<FuelStationPriceData, double> initialCost) =>

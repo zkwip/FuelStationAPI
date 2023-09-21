@@ -1,4 +1,7 @@
-﻿namespace TextScanner
+﻿using TextScanner.Pattern;
+using TextScanner.SpanMapper;
+
+namespace TextScanner
 {
     public class PatternMapper<TOut> : ITextSpanMapper<TOut>
     {

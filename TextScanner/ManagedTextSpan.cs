@@ -1,9 +1,10 @@
 ﻿using System.Globalization;
 using System.Text.RegularExpressions;
+using TextScanner.SpanMapper;
 
 namespace TextScanner
 {
-    public struct ManagedTextSpan
+    public readonly struct ManagedTextSpan
     {
         private static readonly Regex _numberRegex = new("<[^>]*>|[^0-9.,-]");
         private readonly string _text;

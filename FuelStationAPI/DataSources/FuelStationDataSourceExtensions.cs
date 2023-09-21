@@ -1,7 +1,9 @@
-﻿using FuelStationAPI.Domain;
+﻿using FuelStationAPI.Aggregator;
+using FuelStationAPI.Domain;
 using FuelStationAPI.Mappers;
 using Microsoft.Extensions.Caching.Memory;
 using TextScanner;
+using TextScanner.Pattern;
 
 namespace FuelStationAPI.DataSources
 {
@@ -9,7 +11,7 @@ namespace FuelStationAPI.DataSources
     {
         public static void AddFuelStationDataSources(this IServiceCollection services)
         {
-            services.AddSingleton<FuelServiceAggregator>();
+            services.AddSingleton<FuelPricesAggregator>();
             services.AddArgosServices();
             services.AddCarbuServices();
             services.AddTangoServices();
