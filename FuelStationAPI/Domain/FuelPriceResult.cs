@@ -1,4 +1,4 @@
-﻿namespace FuelStationAPI
+﻿namespace FuelStationAPI.Domain
 {
     public class FuelPriceResult
     {

@@ -1,4 +1,4 @@
-﻿namespace FuelStationAPI
+﻿namespace FuelStationAPI.Domain
 {
     public class FuelStationIdentifier
     {
@@ -20,5 +20,11 @@
 
         public override string ToString() => $"{DataPrivider}:{Identifier}";
 
+    }
+
+    public static class FuelStationIdentifierExtensions
+    {
+        public static bool IsCloseTo(this FuelStationIdentifier station, double distance, Geolocation location) => 
+            Geolocation.Distance(station.Location, location) < distance;
     }
 }

@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using FuelStationAPI.Domain;
+using FuelStationAPI.Mappers;
+using Microsoft.Extensions.Caching.Memory;
 using TextScanner;
 
 namespace FuelStationAPI.DataSources
@@ -7,17 +9,17 @@ namespace FuelStationAPI.DataSources
     {
         public static void AddFuelStationDataSources(this IServiceCollection services)
         {
-            AddArgosServices(services);
-            AddCarbuServices(services);
-            AddTangoServices(services);
-            //AddTankBilligServices(services);
-            AddTinqServices(services);
+            services.AddSingleton<FuelServiceAggregator>();
+            services.AddArgosServices();
+            services.AddCarbuServices();
+            services.AddTangoServices();
+            //services.AddTankBilligServices();
+            services.AddTinqServices();
         }
 
-        private static void AddArgosServices(IServiceCollection services)
+        private static void AddArgosServices(this IServiceCollection services)
         {
-            AddDataSourceServices(
-                services,
+            services.AddDataSourceServices(
                 "argos",
                 "",
                 "https://www.argos.nl/tankstations",
@@ -35,10 +37,9 @@ namespace FuelStationAPI.DataSources
                 false);
         }
 
-        private static void AddCarbuServices(IServiceCollection services)
+        private static void AddCarbuServices(this IServiceCollection services)
         {
-            AddDataSourceServices(
-                services,
+            services.AddDataSourceServices(
                 "carbu",
                 "",
                 "https://carbu.com/belgie//liste-stations-service/E10/Bilzen/3740/BE_li_701",
@@ -57,10 +58,9 @@ namespace FuelStationAPI.DataSources
                 true);
         }
 
-        private static void AddTangoServices(IServiceCollection services)
+        private static void AddTangoServices(this IServiceCollection services)
         {
-            AddDataSourceServices(
-                services,
+            services.AddDataSourceServices(
                 "tango",
                 "",
                 "https://www.tango.nl/get/stations.json",
@@ -79,11 +79,11 @@ namespace FuelStationAPI.DataSources
                 false);
         }
 
-        private static void AddTankBilligServices(IServiceCollection services)
+        // pricing does not yet work with this version of TextScanner, waiting for TextMagic instead.
+
+        /* private static void AddTankBilligServices(this IServiceCollection services)
         {
-            // pricing does not yet work with this version of TextScanner, waiting for TextMagic instead.
-            AddDataSourceServices(
-                services,
+            services.AddDataSourceServices(
                 "tankbillig",
                 "",
                 "https://tankbillig.info/index.php?lat=51.7833&long=6.0167",
@@ -99,12 +99,11 @@ namespace FuelStationAPI.DataSources
                     .AddHandle("<div class=\"pump_price\">")
                     .AddEnclosedGetter("price", "<span class=\"price\">", "</span> EUR"),
                 false);
-        }
+        } */
 
-        private static void AddTinqServices(IServiceCollection services)
+        private static void AddTinqServices(this IServiceCollection services)
         {
-            AddDataSourceServices(
-                services,
+            services.AddDataSourceServices(
                 "tinq",
                 "TINQ ",
                 "https://www.tinq.nl/tankstations",
@@ -120,7 +119,7 @@ namespace FuelStationAPI.DataSources
                 false);
         }
 
-        private static void AddDataSourceServices(IServiceCollection services, string providerName, string namePrefix, string listUrl, Func<FuelStationIdentifier, string> priceUrlBuilder, ScanPattern listPattern, ScanPattern pricePattern, bool useDecimalCommaPrice)
+        private static void AddDataSourceServices(this IServiceCollection services, string providerName, string namePrefix, string listUrl, Func<FuelStationIdentifier, string> priceUrlBuilder, ScanPattern listPattern, ScanPattern pricePattern, bool useDecimalCommaPrice)
         {
             services.AddHttpClient(providerName, client =>
             {

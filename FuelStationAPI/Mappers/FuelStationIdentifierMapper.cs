@@ -1,6 +1,7 @@
-﻿using TextScanner;
+﻿using FuelStationAPI.Domain;
+using TextScanner;
 
-namespace FuelStationAPI
+namespace FuelStationAPI.Mappers
 {
     internal class FuelStationIdentifierMapper : IScanResultMapper<FuelStationIdentifier>
     {

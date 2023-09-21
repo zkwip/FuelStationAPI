@@ -1,13 +1,12 @@
-﻿
-namespace FuelStationAPI
+﻿namespace FuelStationAPI.Domain
 {
-    public class FuelStationPricesPair
+    public class FuelStationPriceData
     {
         public FuelStationIdentifier Station { get; }
 
         public IEnumerable<FuelPriceResult> Prices { get; }
 
-        public FuelStationPricesPair(FuelStationIdentifier station, IEnumerable<FuelPriceResult> prices)
+        public FuelStationPriceData(FuelStationIdentifier station, IEnumerable<FuelPriceResult> prices)
         {
             Prices = prices;
             Station = station;

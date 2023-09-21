@@ -1,4 +1,4 @@
-﻿namespace FuelStationAPI
+﻿namespace FuelStationAPI.Domain
 {
     public class Geolocation
     {
@@ -42,7 +42,7 @@
             return (x, y, z);
         }
 
-        public string LinkTo() => String.Format("https://maps.google.com/maps?daddr={0},{0}", Latitude, Longitude);
+        public string LinkTo() => string.Format("https://maps.google.com/maps?daddr={0},{1}", Latitude, Longitude);
 
     }
 }

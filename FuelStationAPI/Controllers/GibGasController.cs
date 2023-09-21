@@ -1,4 +1,4 @@
-﻿using FuelStationAPI.DataSources;
+﻿using FuelStationAPI.Domain;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FuelStationAPI.Controllers
@@ -7,117 +7,54 @@ namespace FuelStationAPI.Controllers
     [Route("[controller]")]
     public class GibGasController : ControllerBase
     {
-        private readonly ILogger<GibGasController> _logger;
-        private readonly IEnumerable<IFuelPriceDataSource> _fuelPriceDataSources;
-        private readonly IEnumerable<IFuelStationDetailSource> _stationDetailSources;
-        private readonly IEnumerable<IFuelStationListSource> _stationListSources;
-        private Geolocation _location;
+        private readonly FuelServiceAggregator _fuelServiceAggregator;
 
-        public GibGasController(ILogger<GibGasController> logger, IEnumerable<IFuelPriceDataSource> fuelPriceDataSources, IEnumerable<IFuelStationDetailSource> stationDetailSources, IEnumerable<IFuelStationListSource> stationListSources)
+        private readonly Geolocation _location;
+        private readonly double _searchDistance = 15.0;
+        private readonly double _litersPerKm = 0.07;
+        private readonly double _tankSize = 45.0;
+
+        public GibGasController(FuelServiceAggregator fuelServiceAggregator)
         {
-            _logger = logger;
             _location = Geolocation.Maastricht;
-
-            _fuelPriceDataSources = fuelPriceDataSources;
-            _stationDetailSources = stationDetailSources;
-            _stationListSources = stationListSources;
+            _fuelServiceAggregator = fuelServiceAggregator;
         }
-
-        private readonly Predicate<FuelStationIdentifier> AllStations = s => true;
 
         [HttpGet("Version")]
-        public string Version() => "v0.0.2";
+        public string Version() => "v0.1.1";
 
         [HttpGet("GetStations")]
-        public async Task<List<FuelStationIdentifier>> GetStationsAsync() => await GetStationsAsync(null);
+        public IAsyncEnumerable<FuelStationIdentifier> GetStationsAsync() => 
+            _fuelServiceAggregator.GetAllStationsAsync();
 
-        private async Task<List<FuelStationIdentifier>> GetStationsAsync(Predicate<FuelStationIdentifier>? which)
-        {
-            var results = await Task.WhenAll(_stationListSources.Select(x => x.GetStationListAsync()));
-            var list = new List<FuelStationIdentifier>();
-
-            if (which is null)
-                which = AllStations;
-
-            foreach (var item in results)
-            {
-                if (item.Succes)
-                {
-                    list.AddRange(item.Result.FindAll(which));
-                    continue;
-                }
-
-                _logger.LogWarning("Empty result detected");
-
-            }
-
-            return list;
-        }
-
-        [HttpGet("GetPrices")]
-        public async Task<List<FuelPriceResult>> GetPricesAsync(FuelStationIdentifier station) => await GetPricesAsync(station, null);
-        private async Task<List<FuelPriceResult>> GetPricesAsync(FuelStationIdentifier station, Predicate<FuelType>? fuels)
-        {
-            IFuelPriceDataSource? priceSource = GetPriceSource(station);
-            if (priceSource is null)
-                throw new Exception();
-
-            if (fuels is null)
-                fuels = FuelTypeExtensions.Gasoline;
-
-            var prices = await priceSource.GetPricesAsync(station);
-
-            if (!prices.Succes)
-                _logger.LogWarning("GetPrices failed: {}", prices.Message);
-
-            List<FuelPriceResult> list = prices.Result;
-
-            if (list.Count == 0)
-                _logger.LogWarning("no prices found for station {}", station);
-
-            return list.FindAll(item => fuels.Invoke(item.FuelType));
-        }
-
-        [HttpGet("ListFilteredStations")]
-        public async Task<IEnumerable<FuelStationIdentifier>> ListFilteredStationsAsync(Predicate<FuelStationIdentifier>? which = null)
-        {
-            IEnumerable<FuelStationIdentifier> list = await GetStationsAsync(which);
-            list = list.Where(x => Geolocation.Distance(x.Location, _location) < 30);
-            return list;
-        }
-
-        private async Task<FuelStationPricesPair> GetStationPricePairAsync(FuelStationIdentifier station, Predicate<FuelType>? fuels = null)
-        {
-            var prices = await GetPricesAsync(station, fuels);
-            return new FuelStationPricesPair(station, prices);
-        }
-
-        [HttpGet("GetAllPrices")]
-        public async Task<List<FuelStationPricesPair>> GetAllPricesAsync() => await GetAllPricesAsync(null, null);
+        [HttpGet("GetCloseStations")]
+        public IAsyncEnumerable<FuelStationIdentifier> GetCloseStationsAsync() =>
+            _fuelServiceAggregator.GetAllStationsAsync()
+                .Where(station => station.IsCloseTo(_searchDistance, _location));
 
         [HttpGet("GetClosePrices")]
-        public async Task<List<FuelStationPricesPair>> GetClosePricesAsync() => await GetAllPricesAsync(x => Geolocation.Distance(x.Location, _location) < 50.0, null);
+        public IAsyncEnumerable<FuelStationPriceData> GetClosePricesAsync() =>
+            _fuelServiceAggregator.GetAllStationsAsync()
+                .Where(station => station.IsCloseTo(_searchDistance, _location))
+                .AggregatePrices(_fuelServiceAggregator)
+                .OrderBy(data => data.Prices.Min(price => price.Price));
+
+        [HttpGet("GetCloseE95Prices")]
+        public IAsyncEnumerable<FuelStationPriceData> GetCloseE95PricesAsync() =>
+            _fuelServiceAggregator.GetAllStationsAsync()
+                .Where(station => station.IsCloseTo(_searchDistance, _location))
+                .AggregatePrices(_fuelServiceAggregator)
+                .OnlyFuel(FuelType.Euro95_E10)
+                .OrderBy(data => data.Prices.Min(price => price.Price));
 
 
-        private async Task<List<FuelStationPricesPair>> GetAllPricesAsync(Predicate<FuelStationIdentifier>? which = null, Predicate<FuelType>? fuels = null)
-        {
-            var stations = await GetStationsAsync(which);
-
-            var pairs = await Task.WhenAll(stations.Select(x => GetStationPricePairAsync(x, fuels)));
-            return pairs.Where(x => x.Prices.Any()).ToList();
-        }
-
-        private IFuelPriceDataSource? GetPriceSource(FuelStationIdentifier station)
-        {
-            foreach (IFuelPriceDataSource source in _fuelPriceDataSources)
-            {
-                if (station.DataPrivider == source.DataProvider)
-                    return source;
-            }
-
-            _logger.LogWarning("Could not find a suitable PriceDataSource for the provider handle {}", station.DataPrivider);
-
-            return null;
-        }
+        [HttpGet("GetBestPrices")]
+        public IAsyncEnumerable<CostAnalysis<FuelStationPriceData>> GetBestPricesAsync() =>
+            _fuelServiceAggregator.GetAllStationsAsync()
+                .Where(station => station.IsCloseTo(_searchDistance, _location))
+                .AggregatePrices(_fuelServiceAggregator)
+                .OnlyFuel(FuelType.Euro95_E10)
+                .ToCostAnalysis(data => data.Prices.Min(price => price.Price) * _tankSize)
+                .AddCost(data => 2 * Geolocation.Distance(_location, data.Station.Location) * _litersPerKm * data.Prices.Min(price => price.Price));
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using FuelStationAPI.Domain;
+using Microsoft.Extensions.Caching.Memory;
 using TextScanner;
 
 namespace FuelStationAPI.DataSources
@@ -23,7 +24,7 @@ namespace FuelStationAPI.DataSources
             _providerName = providerName;
         }
 
-        public async Task<MappedScanResult<List<FuelStationIdentifier>>> GetStationListAsync()
+        public async Task<Option<List<FuelStationIdentifier>>> GetStationListAsync()
         {
             return await _memoryCache.GetOrCreateAsync(_providerName, async entry =>
             {
@@ -32,12 +33,12 @@ namespace FuelStationAPI.DataSources
             });
         }
 
-        private async Task<MappedScanResult<List<FuelStationIdentifier>>> QueryStationListAsync()
+        private async Task<Option<List<FuelStationIdentifier>>> QueryStationListAsync()
         {
             var body = await GetHttpBodyAsync(_url);
 
             if (body is null)
-                return MappedScanResult<List<FuelStationIdentifier>>.Fail("The HTTP request failed");
+                return Option<List<FuelStationIdentifier>>.None();
 
             return _mapper.Map(new(body));
 
