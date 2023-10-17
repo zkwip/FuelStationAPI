@@ -14,12 +14,10 @@ namespace FuelStationAPI.DataSources
                 client.DefaultRequestHeaders.Add("User-Agent", "GibGas");
             });
 
-            //services.AddSingleton<IDataSource, ArgosScrapeService>();
+            services.AddSingleton<IDataSource, ArgosScrapeService>();
             services.AddSingleton<IDataSource, CarbuScrapeService>();
-            //services.AddSingleton<IDataSource, TangoScrapeService>();
-            //services.AddSingleton<IDataSource, TinqScrapeService>();
-
-            services.AddSingleton<IDataSource, TestScrapeService>();
+            services.AddSingleton<IDataSource, TangoScrapeService>();
+            services.AddSingleton<IDataSource, TinqScrapeService>();
 
             services.AddSingleton<FuelPricesAggregator>();
 

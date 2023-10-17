@@ -32,5 +32,7 @@ namespace FuelStationAPI.Aggregator
             original.Select(item => item.AddCost(costMap(item.Value)));
 
 
+        public static async IAsyncEnumerable<TOut> SelectAsync<TIn, TOut>(this IAsyncEnumerable<TIn> source, Func<TIn, Task<TOut>> map) { await foreach (var item in source) yield return await map(item); }
+
     }
 }

@@ -59,5 +59,12 @@ namespace FuelStationAPI.Controllers
                 .AddCost(data => 2 * Geolocation.Distance(_location, data.Station.Location) * _litersPerKm * data.Prices.Min(price => price.Price))
                 .OrderBy(anal => anal.Cost)
                 .Take(5);
+
+        [HttpGet("GetSourcesStatus")]
+        public IAsyncEnumerable<SourceStatusReport> GetStatusReportAsync() =>
+            _fuelServiceAggregator.GetAllStationsAsync()
+                .GroupBy(x => x.DataPrivider)
+                .SelectAsync(x => SourceStatusReport.CreateAsync(x))
+                .OrderBy(x => x.StationCount);
     }
 }
