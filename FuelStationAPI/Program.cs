@@ -1,9 +1,9 @@
 using FuelStationAPI.DataSources;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddMemoryCache();
+builder.Services.AddFuelStationServices();
 builder.Services.AddControllers();
-builder.Services.AddFuelStationDataSources();
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

@@ -6,20 +6,19 @@ namespace FuelStationAPI.Aggregator
     public class FuelPricesAggregator
     {
         private readonly ILogger<FuelPricesAggregator> _logger;
-        private readonly IEnumerable<IFuelPriceDataSource> _fuelPriceDataSources;
-        private readonly IEnumerable<IFuelStationListSource> _stationListSources;
+        private readonly IEnumerable<IDataSource> _dataSources;
 
-        public FuelPricesAggregator(ILogger<FuelPricesAggregator> logger, IEnumerable<IFuelPriceDataSource> fuelPriceDataSources, IEnumerable<IFuelStationListSource> stationListSources)
+        public FuelPricesAggregator(ILogger<FuelPricesAggregator> logger, IEnumerable<IDataSource> dataSources)
         {
             _logger = logger;
-
-            _fuelPriceDataSources = fuelPriceDataSources;
-            _stationListSources = stationListSources;
+            _dataSources = dataSources;
         }
 
         public async IAsyncEnumerable<FuelStationIdentifier> GetAllStationsAsync()
         {
-            var tasks = _stationListSources.Select(x => x.GetStationListAsync());
+            _logger.Log(LogLevel.Information, "Number of sources: {sources}", _dataSources.Count());
+
+            var tasks = _dataSources.Select(x => x.GetStationListAsync());
             var results = GreedyAwaitAll(tasks);
 
             await foreach (var item in results)
@@ -69,7 +68,7 @@ namespace FuelStationAPI.Aggregator
             GetPriceSource(station).Map(x => GetPricesFromSource(x, station))
                 .Reduce(AsyncEnumerable.Empty<FuelPriceResult>());
 
-        private static async IAsyncEnumerable<FuelPriceResult> GetPricesFromSource(IFuelPriceDataSource source, FuelStationIdentifier station)
+        private static async IAsyncEnumerable<FuelPriceResult> GetPricesFromSource(IDataSource source, FuelStationIdentifier station)
         {
             var opt = await source.GetPricesAsync(station);
             foreach (var item in opt.Reduce(new()))
@@ -78,15 +77,17 @@ namespace FuelStationAPI.Aggregator
             }
         }
 
-        private Option<IFuelPriceDataSource> GetPriceSource(FuelStationIdentifier station)
+        private Option<IDataSource> GetPriceSource(FuelStationIdentifier station)
         {
-            foreach (IFuelPriceDataSource source in _fuelPriceDataSources)
+            _logger.Log(LogLevel.Warning, "Number of sources: {sources}", _dataSources.Count());
+
+            foreach (IDataSource source in _dataSources)
             {
                 if (station.DataPrivider == source.DataProvider)
-                    return Option<IFuelPriceDataSource>.Some(source);
+                    return Option<IDataSource>.Some(source);
             }
 
-            return Option<IFuelPriceDataSource>.None();
+            return Option<IDataSource>.None();
         }
     }
 }
