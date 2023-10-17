@@ -2,7 +2,7 @@
 
 namespace FuelStationAPI.Aggregator
 {
-    static class FuelPricesAggregatorExtensions
+    static class AggregatorExtensions
     {
         public static IAsyncEnumerable<FuelStationPriceData> NonEmpty(this IAsyncEnumerable<FuelStationPriceData> source) =>
             source.Where(x => x.Prices.Any(price => price.Price > 0.0));
@@ -18,7 +18,7 @@ namespace FuelStationAPI.Aggregator
             if (!oldData.Prices.Any())
                 return oldData;
 
-            var newPrice = oldData.Prices.Where(x => fuelSpec(x.FuelType));
+            var newPrice = oldData.Prices.Where(x => fuelSpec(x.FuelType)).Where(x => x.Price > 0);
             return new FuelStationPriceData(oldData.Station, newPrice);
         }
 
