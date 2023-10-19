@@ -22,7 +22,7 @@ namespace FuelStationAPI.Aggregator
             return new FuelStationPriceData(oldData.Station, newPrice);
         }
 
-        public static IAsyncEnumerable<FuelStationPriceData> AggregatePrices(this IAsyncEnumerable<FuelStationIdentifier> stations, FuelPricesAggregator aggregator) =>
+        public static IAsyncEnumerable<FuelStationPriceData> AggregatePrices(this IAsyncEnumerable<Station> stations, FuelPricesAggregator aggregator) =>
             aggregator.GetMultiStationPriceDataAsync(stations).NonEmpty();
 
         public static IAsyncEnumerable<CostAnalysis<FuelStationPriceData>> ToCostAnalysis(this IAsyncEnumerable<FuelStationPriceData> data, Func<FuelStationPriceData, double> initialCost) =>

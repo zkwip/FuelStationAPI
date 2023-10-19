@@ -4,12 +4,12 @@ using TextScanner.Pattern;
 
 namespace FuelStationAPI.DataSources.Implementations
 {
-    public class CarbuScrapeService : BaseScrapeService
+    public class CarbuScraper : BaseScraper
     {
-        public CarbuScrapeService(IHttpClientFactory httpClientFactory, IMemoryCache memoryCache, ILogger<BaseScrapeService> logger) : base(httpClientFactory, memoryCache, logger, "carbu", true) { }
+        public CarbuScraper(IHttpClientFactory httpClientFactory, IMemoryCache memoryCache, ILogger<BaseScraper> logger) : base(httpClientFactory, memoryCache, logger, "carbu", true) { }
 
         protected override string StationListUrl => "https://carbu.com/belgie//liste-stations-service/E10/Bilzen/3740/BE_li_701";
-        protected override string PriceUrlBuilder(FuelStationIdentifier station) => $"https://carbu.com/belgie/index.php/station/{station.Identifier}";
+        protected override string PriceUrlBuilder(Station station) => $"https://carbu.com/belgie/index.php/station/{station.Identifier}";
 
         protected override ScanPattern StationPattern => ScanPattern.Create()
             .AddHandle("<div class=\"station-content col-xs-12\"")

@@ -14,7 +14,7 @@ namespace FuelStationAPI.Aggregator
             _dataSources = dataSources;
         }
 
-        public async IAsyncEnumerable<FuelStationIdentifier> GetAllStationsAsync()
+        public async IAsyncEnumerable<Station> GetAllStationsAsync()
         {
             _logger.Log(LogLevel.Information, "Number of sources: {sources}", _dataSources.Count());
 
@@ -23,7 +23,7 @@ namespace FuelStationAPI.Aggregator
 
             await foreach (var item in results)
             {
-                foreach (var station in item.Reduce(new List<FuelStationIdentifier>()))
+                foreach (var station in item.Reduce(new List<Station>()))
                     yield return station;
             }
         }
@@ -36,13 +36,13 @@ namespace FuelStationAPI.Aggregator
             }
         }
 
-        public async Task<FuelStationPriceData> GetStationPriceDataAsync(FuelStationIdentifier station)
+        public async Task<FuelStationPriceData> GetStationPriceDataAsync(Station station)
         {
             var prices = await Collect(GetStationPricesAsync(station));
             return new FuelStationPriceData(station, prices);
         }
 
-        public async IAsyncEnumerable<FuelStationPriceData> GetMultiStationPriceDataAsync(IAsyncEnumerable<FuelStationIdentifier> stations)
+        public async IAsyncEnumerable<FuelStationPriceData> GetMultiStationPriceDataAsync(IAsyncEnumerable<Station> stations)
         {
             await foreach (var station in stations)
             {
@@ -64,11 +64,11 @@ namespace FuelStationAPI.Aggregator
             return values;
         }
 
-        private IAsyncEnumerable<FuelPriceResult> GetStationPricesAsync(FuelStationIdentifier station) =>
+        private IAsyncEnumerable<FuelPriceResult> GetStationPricesAsync(Station station) =>
             GetPriceSource(station).Map(x => GetPricesFromSource(x, station))
                 .Reduce(AsyncEnumerable.Empty<FuelPriceResult>());
 
-        private static async IAsyncEnumerable<FuelPriceResult> GetPricesFromSource(IDataSource source, FuelStationIdentifier station)
+        private static async IAsyncEnumerable<FuelPriceResult> GetPricesFromSource(IDataSource source, Station station)
         {
             var opt = await source.GetPricesAsync(station);
             foreach (var item in opt.Reduce(new()))
@@ -77,7 +77,7 @@ namespace FuelStationAPI.Aggregator
             }
         }
 
-        private Option<IDataSource> GetPriceSource(FuelStationIdentifier station)
+        private Option<IDataSource> GetPriceSource(Station station)
         {
             _logger.Log(LogLevel.Warning, "Number of sources: {sources}", _dataSources.Count());
 

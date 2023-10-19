@@ -3,7 +3,7 @@ using TextScanner;
 
 namespace FuelStationAPI.Mappers
 {
-    internal class FuelStationIdentifierMapper : IScanResultMapper<FuelStationIdentifier>
+    internal class FuelStationIdentifierMapper : IScanResultMapper<Station>
     {
         private readonly string _providerName;
         private readonly string _namePrefix;
@@ -14,10 +14,10 @@ namespace FuelStationAPI.Mappers
             _namePrefix = namePrefix;
         }
 
-        public MappedScanResult<FuelStationIdentifier> Map(ScanResult result)
+        public MappedScanResult<Station> Map(ScanResult result)
         {
             if (!result.Succes)
-                return MappedScanResult<FuelStationIdentifier>.Fail(result.Message);
+                return MappedScanResult<Station>.Fail(result.Message);
 
             try
             {
@@ -26,11 +26,11 @@ namespace FuelStationAPI.Mappers
                 var name = result["name"].ToString();
                 var identifier = result["identifier"].ToString();
 
-                return new(new FuelStationIdentifier(_providerName, identifier, _namePrefix + name, new Geolocation(lat, lng)));
+                return new(new Station(_providerName, identifier, _namePrefix + name, new Geolocation(lat, lng)));
             }
             catch (Exception ex)
             {
-                return MappedScanResult<FuelStationIdentifier>.Fail(ex.Message);
+                return MappedScanResult<Station>.Fail(ex.Message);
             }
         }
     }

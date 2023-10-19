@@ -22,7 +22,7 @@ namespace FuelStationAPI.Mappers
                 var price = result["price"].ToDouble(_useDecimalCommaInPrice ? "fr-FR" : "en-US");
                 var type = result["type"].MapWith(new FuelTypeMapper()).Result;
 
-                return new MappedScanResult<FuelPriceResult>(new FuelPriceResult(type, price));
+                return new MappedScanResult<FuelPriceResult>(new FuelPriceResult(type, price, DateTime.Now));
             }
             catch (Exception ex)
             {

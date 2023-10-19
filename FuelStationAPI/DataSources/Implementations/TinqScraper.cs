@@ -4,11 +4,11 @@ using TextScanner.Pattern;
 
 namespace FuelStationAPI.DataSources.Implementations
 {
-    public class TinqScrapeService : BaseScrapeService
+    public class TinqScraper : BaseScraper
     {
-        public TinqScrapeService(IHttpClientFactory httpClientFactory, IMemoryCache memoryCache, ILogger<BaseScrapeService> logger) : base(httpClientFactory, memoryCache, logger, "tinq", false) { }
+        public TinqScraper(IHttpClientFactory httpClientFactory, IMemoryCache memoryCache, ILogger<BaseScraper> logger) : base(httpClientFactory, memoryCache, logger, "tinq", false) { }
         protected override string StationListUrl => "https://www.tinq.nl/tankstations";
-        protected override string PriceUrlBuilder(FuelStationIdentifier station) => $"https://www.tinq.nl/tankstations/{station.Identifier}";
+        protected override string PriceUrlBuilder(Station station) => $"https://www.tinq.nl/tankstations/{station.Identifier}";
 
         protected override ScanPattern StationPattern => ScanPattern.Create()
             .AddEnclosedGetter("lat", "data-lat=\"", "\"")

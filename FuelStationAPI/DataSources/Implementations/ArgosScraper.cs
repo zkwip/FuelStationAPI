@@ -4,11 +4,11 @@ using TextScanner.Pattern;
 
 namespace FuelStationAPI.DataSources.Implementations
 {
-    public class ArgosScrapeService : BaseScrapeService
+    public class ArgosScraper : BaseScraper
     {
-        public ArgosScrapeService(IHttpClientFactory httpClientFactory, IMemoryCache memoryCache, ILogger<BaseScrapeService> logger) : base(httpClientFactory, memoryCache, logger, "argos", false) { }
+        public ArgosScraper(IHttpClientFactory httpClientFactory, IMemoryCache memoryCache, ILogger<BaseScraper> logger) : base(httpClientFactory, memoryCache, logger, "argos", false) { }
         protected override string StationListUrl => "https://www.argos.nl/tankstations";
-        protected override string PriceUrlBuilder(FuelStationIdentifier station) => $"https://www.argos.nl/tankstations/{station.Identifier}";
+        protected override string PriceUrlBuilder(Station station) => $"https://www.argos.nl/tankstations/{station.Identifier}";
 
         protected override ScanPattern StationPattern => ScanPattern.Create()
             .AddHandle("<div class=\"marker\" data-id=\"")

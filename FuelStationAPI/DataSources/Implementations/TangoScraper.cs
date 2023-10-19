@@ -4,11 +4,11 @@ using TextScanner.Pattern;
 
 namespace FuelStationAPI.DataSources.Implementations
 {
-    public class TangoScrapeService : BaseScrapeService
+    public class TangoScraper : BaseScraper
     {
-        public TangoScrapeService(IHttpClientFactory httpClientFactory, IMemoryCache memoryCache, ILogger<BaseScrapeService> logger) : base(httpClientFactory, memoryCache, logger, "tango", false) { }
+        public TangoScraper(IHttpClientFactory httpClientFactory, IMemoryCache memoryCache, ILogger<BaseScraper> logger) : base(httpClientFactory, memoryCache, logger, "tango", false) { }
         protected override string StationListUrl => "https://www.tango.nl/get/stations.json";
-        protected override string PriceUrlBuilder(FuelStationIdentifier station) => $"https://www.tango.nl/stations/{station.Identifier}";
+        protected override string PriceUrlBuilder(Station station) => $"https://www.tango.nl/stations/{station.Identifier}";
 
         protected override ScanPattern StationPattern => ScanPattern.Create()
             .AddHandle("StationId")

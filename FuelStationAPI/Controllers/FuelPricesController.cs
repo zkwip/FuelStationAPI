@@ -25,11 +25,11 @@ namespace FuelStationAPI.Controllers
         public string Version() => "v0.1.1";
 
         [HttpGet("GetStations")]
-        public IAsyncEnumerable<FuelStationIdentifier> GetStationsAsync() => 
+        public IAsyncEnumerable<Station> GetStationsAsync() => 
             _fuelServiceAggregator.GetAllStationsAsync();
 
         [HttpGet("GetCloseStations")]
-        public IAsyncEnumerable<FuelStationIdentifier> GetCloseStationsAsync() =>
+        public IAsyncEnumerable<Station> GetCloseStationsAsync() =>
             _fuelServiceAggregator.GetAllStationsAsync()
                 .Where(station => station.IsCloseTo(_searchDistance, _location));
 

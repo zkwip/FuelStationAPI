@@ -32,17 +32,17 @@
 
         private static (double x, double y, double z) LlTo3dPoint(Geolocation p)
         {
-            const double er = 6378.137;
-            const double pr = 6356.752;
+            const double equatorRadius = 6378.137;
+            const double poleRadius = 6356.752;
 
-            double x = er * Math.Cos(p.Latitude * Math.PI / 180.0) * Math.Sin(p.Longitude * Math.PI / 180.0);
-            double y = er * Math.Cos(p.Latitude * Math.PI / 180.0) * Math.Cos(p.Longitude * Math.PI / 180.0);
-            double z = pr * Math.Sin(p.Latitude * Math.PI / 180.0);
+            double x = equatorRadius * Math.Cos(p.Latitude * Math.PI / 180.0) * Math.Sin(p.Longitude * Math.PI / 180.0);
+            double y = equatorRadius * Math.Cos(p.Latitude * Math.PI / 180.0) * Math.Cos(p.Longitude * Math.PI / 180.0);
+            double z = poleRadius * Math.Sin(p.Latitude * Math.PI / 180.0);
 
             return (x, y, z);
         }
 
-        public string LinkTo() => string.Format("https://maps.google.com/maps?daddr={0},{1}", Latitude, Longitude);
+        public string MapsLink() => string.Format("https://maps.google.com/maps?daddr={0},{1}", Latitude, Longitude);
 
     }
 }

@@ -4,7 +4,7 @@ using FuelStationAPI.DataSources.Implementations;
 namespace FuelStationAPI.DataSources
 {
     
-    public static class FuelStationDataSourceExtensions
+    public static class DataSourceExtensions
     {
         public static void AddFuelStationServices(this IServiceCollection services)
         {
@@ -14,10 +14,10 @@ namespace FuelStationAPI.DataSources
                 client.DefaultRequestHeaders.Add("User-Agent", "GibGas");
             });
 
-            services.AddSingleton<IDataSource, ArgosScrapeService>();
-            services.AddSingleton<IDataSource, CarbuScrapeService>();
-            services.AddSingleton<IDataSource, TangoScrapeService>();
-            services.AddSingleton<IDataSource, TinqScrapeService>();
+            services.AddSingleton<IDataSource, ArgosScraper>();
+            services.AddSingleton<IDataSource, CarbuScraper>();
+            services.AddSingleton<IDataSource, TangoScraper>();
+            services.AddSingleton<IDataSource, TinqScraper>();
 
             services.AddSingleton<FuelPricesAggregator>();
 

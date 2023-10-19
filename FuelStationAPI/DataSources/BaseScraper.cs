@@ -6,15 +6,15 @@ using TextScanner.Pattern;
 
 namespace FuelStationAPI.DataSources
 {
-    public abstract class BaseScrapeService : IDataSource
+    public abstract class BaseScraper : IDataSource
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IMemoryCache _memoryCache;
-        private readonly ILogger<BaseScrapeService> _logger;
+        private readonly ILogger<BaseScraper> _logger;
         private readonly string _dataProvider;
         private readonly bool _decimalComma;
 
-        protected BaseScrapeService(IHttpClientFactory httpClientFactory, IMemoryCache memoryCache, ILogger<BaseScrapeService> logger, string dataProvider, bool decimalComma)
+        protected BaseScraper(IHttpClientFactory httpClientFactory, IMemoryCache memoryCache, ILogger<BaseScraper> logger, string dataProvider, bool decimalComma)
         {
             _httpClientFactory = httpClientFactory;
             _memoryCache = memoryCache;
@@ -23,14 +23,14 @@ namespace FuelStationAPI.DataSources
             _decimalComma = decimalComma;
         }
 
-        protected abstract string PriceUrlBuilder(FuelStationIdentifier station);
+        protected abstract string PriceUrlBuilder(Station station);
         protected abstract string StationListUrl { get; }
         protected abstract ScanPattern StationPattern { get; }
         protected abstract ScanPattern PricePattern { get; }
         public string DataProvider => _dataProvider;
 
 
-        public async Task<Option<List<FuelStationIdentifier>>> GetStationListAsync()
+        public async Task<Option<List<Station>>> GetStationListAsync()
         {
             return await _memoryCache.GetOrCreateAsync(_dataProvider, async entry =>
             {
@@ -39,22 +39,22 @@ namespace FuelStationAPI.DataSources
             });
         }
 
-        private async Task<Option<List<FuelStationIdentifier>>> QueryStationListAsync()
+        private async Task<Option<List<Station>>> QueryStationListAsync()
         {
             var body = await GetHttpBodyAsync(StationListUrl);
 
             if (body is null)
             {
                 _logger.LogWarning("Scraper of type {dataProvider} found null body on URL {url}", _dataProvider, StationListUrl);
-                return Option<List<FuelStationIdentifier>>.None();
+                return Option<List<Station>>.None();
             }
 
-            var stationMapper = new PatternMapper<FuelStationIdentifier>(
+            var stationMapper = new PatternMapper<Station>(
                 StationPattern,
                 new FuelStationIdentifierMapper(_dataProvider, "")
             ).Repeat;
 
-            Option<List<FuelStationIdentifier>> data = stationMapper.Map(new(body));
+            Option<List<Station>> data = stationMapper.Map(new(body));
 
             _logger.LogWarning("Number of results from provider {provider}: {number}",_dataProvider, data.Reduce(new()).Count());
             return data;
@@ -72,7 +72,7 @@ namespace FuelStationAPI.DataSources
             return msg;
         }
 
-        public async Task<Option<List<FuelPriceResult>>> GetPricesAsync(FuelStationIdentifier station)
+        public async Task<Option<List<FuelPriceResult>>> GetPricesAsync(Station station)
         {
             return await _memoryCache.GetOrCreateAsync(station, async entry =>
             {
@@ -81,7 +81,7 @@ namespace FuelStationAPI.DataSources
             });
         }
 
-        private async Task<Option<List<FuelPriceResult>>> QueryStationPricesAsync(FuelStationIdentifier station)
+        private async Task<Option<List<FuelPriceResult>>> QueryStationPricesAsync(Station station)
         {
             var body = await GetHttpBodyAsync(PriceUrlBuilder(station));
 

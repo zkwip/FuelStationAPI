@@ -2,11 +2,11 @@
 {
     public class FuelStationPriceData
     {
-        public FuelStationIdentifier Station { get; }
+        public Station Station { get; }
 
         public IEnumerable<FuelPriceResult> Prices { get; }
 
-        public FuelStationPriceData(FuelStationIdentifier station, IEnumerable<FuelPriceResult> prices)
+        public FuelStationPriceData(Station station, IEnumerable<FuelPriceResult> prices)
         {
             Prices = prices;
             Station = station;

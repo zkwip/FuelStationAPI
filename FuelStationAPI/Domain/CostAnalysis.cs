@@ -11,6 +11,10 @@
             Value = value;
         }
 
-        public CostAnalysis<T> AddCost(double cost) { Cost += cost; return this; }
+        public CostAnalysis<T> AddCost(double cost) 
+        {
+            Cost += cost; 
+            return this; 
+        }
     }
 }
